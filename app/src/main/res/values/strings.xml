@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">Inside</string>
+
+    <string name="error_message">Vous n\'avez pas autorisé notre application à accéder aux usages de vos applications,
+    veuillez appuyer sur Reessayer et accepter l\'autorisation d\'accès.</string>
+
+    <string name="card_usage_title">Utilisation</string>
+    <string name="card_usage_recap">Visualisez les temps et les taux d\'utilisation de vos applications</string>
+    <string name="card_apps_autho_title">Autorisations</string>
+    <string name="card_apps_autho_recap">Visualisez les autorisations de vos applications</string>
+    <string name="card_network_title">Données</string>
+    <string name="card_network_recap">Visualisez la consommation des données internet</string>
+
+    <string name="permissiongroup_title">Filtrage des permissions</string>
+
+    <string name="dialog_authorisation_title">Autorisation</string>
+    <string name="dialog_authorisation_body">Cette application a besoin de votre autorisation pour
+        accéder aux données d\'usage. Veuillez autoriser Inside.</string>
+
+    <string name="dialog_phone_permission_title">Autorisation</string>
+    <string name="dialog_phone_permission_body">Cette fonctionnalitée a besoin de votre autorisation
+        pour accéder aux données cellulaire. Veuillez autoriser Inside.</string>
+
+    <string name="permission_group_calendar">Calendrier</string>
+    <string name="permission_group_camera">Caméra</string>
+    <string name="permission_group_contacts">Contacts</string>
+    <string name="permission_group_location">Position</string>
+    <string name="permission_group_microphone">Microphone</string>
+    <string name="permission_group_phone">Téléphone</string>
+    <string name="permission_group_sensors">Capteurs corporels</string>
+    <string name="permission_group_sms">SMS</string>
+    <string name="permission_group_storage">Stockage</string>
+    <string name="permission_group_not_found">Autres permissions</string>
+
+    <string name="transition_appName">tr_appName</string>
+    <string name="transition_appIcon">tr_appIcon</string>
+
+    <string name="help_permissionsdetails_go_settings">En appuyant sur ce bouton, vous pouvez aller dans
+        les paramètres de l\'application et changer les autorisations d\'accès à vos données privées en
+        cliquant sur \"Autorisation\".</string>
+
+    <string name="network_totalValue_string">Total des données consommées :</string>
+</resources>

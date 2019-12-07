@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="datas_unit_entries">
+        <item>Mo</item>
+        <item>Go</item>
+    </string-array>
+    <string-array name="datas_unit_values">
+        <item>Mo</item>
+        <item>Go</item>
+    </string-array>
+</resources>

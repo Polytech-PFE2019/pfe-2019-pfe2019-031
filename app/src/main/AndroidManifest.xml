@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="ez.com.inside">
+
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".activities.StartActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.ErrorAuthorizationActivity" />
+        <activity
+            android:name=".activities.permissions.PermissionsActivity"
+            android:parentActivityName=".activities.StartActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.permissions.PermissionsDetailActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.settings.SettingsActivity"
+            android:parentActivityName=".activities.StartActivity" />
+        <activity
+            android:name=".activities.usage.UsageActivity"
+            android:parentActivityName=".activities.StartActivity"
+            android:theme="@style/AppThemeNoActionBar"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.usage.GraphTimeActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.permissions.PermissionsGroupActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.network.NetworkActivity"
+            android:parentActivityName=".activities.StartActivity"
+            android:screenOrientation="portrait"/>
+    </application>
+
+</manifest>

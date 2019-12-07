@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Données internet">
+
+        <EditTextPreference
+            android:defaultValue="1"
+            android:inputType="number"
+            android:key="beginning_forfait"
+            android:title="Début du forfait téléphonique" />
+
+        <EditTextPreference
+            android:key="amount_forfait"
+            android:title="Montant données forfait"
+            android:inputType="number"
+            android:defaultValue="5"/>
+
+        <ListPreference
+            android:defaultValue="Go"
+            android:summary="%s"
+            android:entries="@array/datas_unit_entries"
+            android:entryValues="@array/datas_unit_values"
+            android:key="unit_forfait"
+            android:title="Unité des données" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
