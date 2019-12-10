@@ -2,7 +2,6 @@ package ez.com.inside.activities.usage;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
@@ -11,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -27,12 +28,13 @@ import ez.com.inside.R;
 import ez.com.inside.business.helpers.PackagesSingleton;
 import ez.com.inside.business.usagerate.UsageRateProviderImpl;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
-import lecho.lib.hellocharts.model.PieChartData;
-import lecho.lib.hellocharts.model.SliceValue;
-import lecho.lib.hellocharts.view.PieChartView;
-
-import static ez.com.inside.activities.usage.UsageActivity.COLOR_OTHER;
-import static ez.com.inside.activities.usage.UsageActivity.COLOR_PANEL;
+import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.AxisValue;
+import lecho.lib.hellocharts.model.Column;
+import lecho.lib.hellocharts.model.ColumnChartData;
+import lecho.lib.hellocharts.model.SubcolumnValue;
+import lecho.lib.hellocharts.util.ChartUtils;
+import lecho.lib.hellocharts.view.ColumnChartView;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPNAME;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPPKGNAME;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_GRAPHMODE;
@@ -43,52 +45,138 @@ import static ez.com.inside.activities.usage.UsageActivity.EXTRA_GRAPHMODE;
 
 public class WeeklyFragment extends Fragment
 {
-    private static int positionOthers = 0;
-
-    private PieChartView chart;
-    private PieChartData data;
-
     private List<AppUsage> usages;
+    private long[] times;
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
-        return inflater.inflate(R.layout.fragment_usage, container, false);
-    }
+    private ColumnChartView chart;
+    private ColumnChartData data;
+
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         usages = new ArrayList<>();
+        View rootView = inflater.inflate(R.layout.fragment_usage, container, false);
+        chart = rootView.findViewById(R.id.AppRate_chart);
+        return rootView;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-
-        try
-        {
+        try {
             generateUsages(8);
         }
         catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
 
-        generateColors();
+        generateDefaultData();
 
-        initializePieChart();
-
-        initializeRecyclerView();
+        //initializeRecyclerView();
     }
 
-    private void initializePieChart()
-    {
-        chart = getView().findViewById(R.id.AppRate_chart);
 
-        generateChartData();
-        chart.setPieChartData(data);
+
+    private void generateDefaultData() {
+        int numSubcolumns = 1;
+        int numColumns = 7;
+
+        List<Column> columns = new ArrayList<Column>();
+        List<SubcolumnValue> values;
+
+        times = new long[7];
+
+        UsageTimeProvider provider = new UsageTimeProvider(getContext());
+        for(AppUsage usage : usages)
+        {
+            for(int i = times.length - 1, index = 0; i >= 0; i--, index++)
+            {
+                Calendar c1 = Calendar.getInstance();
+                c1.add(Calendar.DATE, -i - 1);
+                Calendar c2 = Calendar.getInstance();
+                c2.add(Calendar.DATE, -i);
+                times[index] += provider.getAppUsageTime(usage.packageName, c1, c2);
+            }
+        }
+
+
+        for (int i = 0; i < numColumns; ++i) {
+            values = new ArrayList<>();
+            for (int j = 0; j < numSubcolumns; ++j) {
+                //Create bar with the current value
+                values.add(new SubcolumnValue( times[i]/60, ChartUtils.pickColor()));
+            }
+            Column column = new Column(values);
+            column.setHasLabels(true);
+            columns.add(column);
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        List<Integer> days = setDayOrder(calendar.get(Calendar.DAY_OF_WEEK));
+        List<AxisValue> date = new ArrayList<>();
+        for(int i= 0; i < days.size(); i++){
+            date.add(new AxisValue(i).setLabel(getDayName(days.get(i))));
+        }
+
+        data = new ColumnChartData(columns);
+        Axis axisX = new Axis();
+        axisX.setMaxLabelChars(4);
+        axisX.setValues(date);
+        data.setAxisXBottom(axisX);
+        chart.setColumnChartData(data);
+
+    }
+
+    private List<Integer> setDayOrder(int firstDay){
+        List<Integer> values = new ArrayList<>();
+        int temp = 1;
+        Boolean restart = false;
+        for(int index = 1; index < 7; index ++){
+            if(firstDay+index == 7){
+                values.add(firstDay+index);
+                restart = true;
+
+            } else if (firstDay == 7) {
+                restart = true;
+            }
+
+
+            if(restart){
+                values.add(temp);
+                temp++;
+            }
+            else{
+                values.add(firstDay+index);
+            }
+        }
+
+        if(values.size() == 6){
+            values.add(7);
+        }
+        return values;
+    }
+
+    private String getDayName(int value){
+        switch (value){
+            case 1:
+                return "Dim.";
+            case 2:
+                return "Lun.";
+            case 3:
+                return "Mar.";
+            case 4:
+                return "Mer.";
+            case 5:
+                return "Jeu.";
+            case 6:
+                return "Ven.";
+            case 7:
+                return "Sam.";
+
+        }
+        return "";
     }
 
     private void generateUsages(int nbDays) throws PackageManager.NameNotFoundException
@@ -129,64 +217,6 @@ public class WeeklyFragment extends Fragment
                 return 0;
             }
         });
-    }
-
-    private void generateColors()
-    {
-        int i = 0;
-        for(int j = 0; j < usages.size(); j++)
-        {
-            if(usages.get(j).usageRate > 2)
-            {
-                usages.get(j).color = COLOR_PANEL[i++ % COLOR_PANEL.length];
-            }
-            else
-            {
-                usages.get(j).color = COLOR_OTHER;
-            }
-        }
-    }
-
-    private void generateChartData()
-    {
-        List<SliceValue> values = new ArrayList<>();
-
-        int i = 0;
-
-        SliceValue other = null;
-
-        for(AppUsage usage : usages)
-        {
-            if(usage.usageRate > 2)
-            {
-                SliceValue sliceValue = new SliceValue((float) usage.usageRate, usage.color[0]);
-                sliceValue.setLabel(usage.appName);
-                values.add(sliceValue);
-            }
-            else
-            {
-                if(other == null)
-                {
-                    other = new SliceValue();
-                    other.setColor(usage.color[0]);
-                    other.setLabel("Autres");
-                }
-                other.setValue(other.getValue() + (float) usage.usageRate);
-            }
-        }
-        if(other != null)
-        {
-            values.add(other);
-        }
-
-        data = new PieChartData(values);
-        data.setSlicesSpacing(2);
-
-        data.setHasCenterCircle(true);
-        data.setCenterCircleColor(Color.WHITE);
-        data.setCenterCircleScale((float)0.5);
-
-        data.setHasLabels(true);
     }
 
     private void initializeRecyclerView()

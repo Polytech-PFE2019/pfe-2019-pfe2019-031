@@ -6,11 +6,11 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <lecho.lib.hellocharts.view.PieChartView
+    <lecho.lib.hellocharts.view.ColumnChartView
         android:id="@+id/AppRate_chart"
-        android:layout_width="230dp"
+        android:layout_width="331dp"
         android:layout_height="230dp"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_usage"
