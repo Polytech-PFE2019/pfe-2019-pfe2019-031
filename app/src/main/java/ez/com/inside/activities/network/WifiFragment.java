@@ -12,8 +12,12 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import ez.com.inside.R;
+import ez.com.inside.business.network.Wifi;
+import ez.com.inside.business.network.WifiDatabase;
 
 public class WifiFragment extends Fragment {
+    WifiDatabase db;
+
 
     @Nullable
     @Override
@@ -26,6 +30,7 @@ public class WifiFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        db = WifiDatabase.getInstance(getView().getContext());
     }
 
 
@@ -33,6 +38,7 @@ public class WifiFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
         getWifiLevel();
     }
 
@@ -48,6 +54,14 @@ public class WifiFragment extends Fragment {
         TextView name = getView().findViewById(R.id.WifiName);
         name.setText(wifiManager.getConnectionInfo().getSSID());
         setWifiText(level);
+
+        Wifi wifi = new Wifi();
+        wifi.name = wifiManager.getConnectionInfo().getSSID();
+        wifi.averageLevel = level;
+
+        //db.wifiDao().InsertAll(wifi);
+
+        Log.d("Hey", Integer.toString(db.wifiDao().getAll().size()));
     }
 
 
