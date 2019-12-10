@@ -35,6 +35,9 @@ import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
+
+import static ez.com.inside.activities.usage.UsageActivity.COLOR_OTHER;
+import static ez.com.inside.activities.usage.UsageActivity.COLOR_PANEL;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPNAME;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPPKGNAME;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_GRAPHMODE;
@@ -54,7 +57,6 @@ public class WeeklyFragment extends Fragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
         usages = new ArrayList<>();
         View rootView = inflater.inflate(R.layout.fragment_usage, container, false);
         chart = rootView.findViewById(R.id.AppRate_chart);
@@ -71,13 +73,27 @@ public class WeeklyFragment extends Fragment
         catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
+        generateColors();
         generateDefaultData();
 
-        //initializeRecyclerView();
+        initializeRecyclerView();
     }
 
-
+    private void generateColors()
+    {
+        int i = 0;
+        for(int j = 0; j < usages.size(); j++)
+        {
+            if(usages.get(j).usageRate > 2)
+            {
+                usages.get(j).color = COLOR_PANEL[i++ % COLOR_PANEL.length];
+            }
+            else
+            {
+                usages.get(j).color = COLOR_OTHER;
+            }
+        }
+    }
 
     private void generateDefaultData() {
         int numSubcolumns = 1;
