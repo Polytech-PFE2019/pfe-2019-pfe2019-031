@@ -62,6 +62,7 @@ public class MonthlyFragment extends Fragment
         usages = new ArrayList<>();
     }
 
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {

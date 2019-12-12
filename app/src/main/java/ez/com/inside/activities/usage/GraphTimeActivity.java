@@ -1,33 +1,45 @@
 package ez.com.inside.activities.usage;
 
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
-import androidx.palette.graphics.Palette;
 import ez.com.inside.R;
-import ez.com.inside.activities.helpers.DrawableHelper;
 import ez.com.inside.activities.helpers.TimeFormatHelper;
 import ez.com.inside.business.helpers.CalendarHelper;
+import ez.com.inside.business.helpers.PackagesSingleton;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
-import ez.com.inside.dialogs.PointInformationDialog;
-import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener;
+import ez.com.inside.business.usagetime.Utils;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
-import lecho.lib.hellocharts.model.Line;
-import lecho.lib.hellocharts.model.LineChartData;
-import lecho.lib.hellocharts.model.PointValue;
-import lecho.lib.hellocharts.view.LineChartView;
+import lecho.lib.hellocharts.model.Column;
+import lecho.lib.hellocharts.model.ColumnChartData;
+import lecho.lib.hellocharts.model.PieChartData;
+import lecho.lib.hellocharts.model.SliceValue;
+import lecho.lib.hellocharts.model.SubcolumnValue;
+import lecho.lib.hellocharts.util.ChartUtils;
+import lecho.lib.hellocharts.view.ColumnChartView;
+import lecho.lib.hellocharts.view.PieChartView;
 
 public class GraphTimeActivity extends AppCompatActivity
 {
@@ -35,12 +47,20 @@ public class GraphTimeActivity extends AppCompatActivity
     private String packageName;
     private Drawable icon;
 
-    private LineChartView graph;
-    private LineChartData data;
+    private ColumnChartView chart;
+    private ColumnChartData data;
 
     private GraphMode graphMode;
 
     private long[] times;
+    private long[] completTimes;
+
+    private Utils utils = new Utils();
+
+    private PieChartView pieChart;
+    private PieChartData pieData;
+    private long sumTimes;
+    private static DecimalFormat df = new DecimalFormat("0.0");
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -53,9 +73,9 @@ public class GraphTimeActivity extends AppCompatActivity
         graphMode = (GraphMode) intent.getSerializableExtra(UsageActivity.EXTRA_GRAPHMODE);
         appName = intent.getStringExtra(UsageActivity.EXTRA_APPNAME);
         packageName = intent.getStringExtra(UsageActivity.EXTRA_APPPKGNAME);
+        completTimes = intent.getLongArrayExtra("TIMES");
 
-        try
-        {
+        try{
             icon = getPackageManager().getApplicationIcon(packageName);
         }
         catch (PackageManager.NameNotFoundException e) {
@@ -68,7 +88,10 @@ public class GraphTimeActivity extends AppCompatActivity
         ImageView iconView = findViewById(R.id.icon);
         iconView.setImageDrawable(icon);
 
-        initializeGraph();
+            initializeGraph();
+
+
+        initializePieChart();
 
         TextView totalTimeView = findViewById(R.id.total_time);
 
@@ -76,71 +99,77 @@ public class GraphTimeActivity extends AppCompatActivity
         for(long time : times)
             total += time;
 
-        totalTimeView.setText("Temps total : " + TimeFormatHelper.minutesToHours(total));
+        totalTimeView.setText(TimeFormatHelper.minutesToHours(total));
     }
 
     private void initializeGraph()
     {
-        graph = findViewById(R.id.graph);
-        data = new LineChartData();
+        chart = findViewById(R.id.graph);
+        int numColumns = 7;
 
-        Axis x = new Axis();
+        List<Column> columns = new ArrayList<>();
+        List<SubcolumnValue> values;
 
-        switch(graphMode)
+        times = new long[7];
+
+        UsageTimeProvider provider = new UsageTimeProvider(this);
+        for(int i = times.length - 1, index = 0; i >= 0; i--, index++)
         {
-            case WEEKLY:
-            {
-                x = initializeWeekAxisX();
-                generateTimesWeek();
-                break;
-            }
-            case MONTHLY:
-            {
-                x = initializeMonthAxisX();
-                generateTimesMonth();
-                break;
-            }
+            Calendar c1 = Calendar.getInstance();
+            c1.add(Calendar.DATE, -i - 1);
+
+            Calendar c2 = Calendar.getInstance();
+            c2.add(Calendar.DATE, -i);
+
+            times[index] = provider.getAppUsageTime(packageName, c1, c2);
         }
 
-        // Axis
-        x.setTextColor(new TextView(this).getCurrentTextColor());
-        data.setAxisXBottom(x);
 
-        // Data
-        List<PointValue> values = new ArrayList<PointValue>();
-        for(int i = 0; i < times.length; i++)
-        {
-            values.add(new PointValue(i, times[i]));
+
+        for (int i = 0; i < numColumns; ++i) {
+            values = new ArrayList<>();
+            values.add(new SubcolumnValue( times[i]/60, -13388315));
+            Column column = new Column(values);
+            column.setHasLabels(true);
+            columns.add(column);
+            sumTimes += times[i];
         }
 
-        // Line
-        Line line = new Line(values).setColor(initializeCurveColor()).setCubic(false);
-        List<Line> lines = new ArrayList<>();
-        lines.add(line);
 
-        graph.setOnValueTouchListener(new LineChartOnValueSelectListener() {
-            @Override
-            public void onValueSelected(int lineIndex, int pointIndex, PointValue value) {
-                DialogFragment fragment = new PointInformationDialog();
-                ((PointInformationDialog) fragment).setValue(TimeFormatHelper.minutesToHours((long) value.getY()));
-                fragment.show(getSupportFragmentManager(), "informations");
-            }
+        Calendar calendar = Calendar.getInstance();
+        List<Integer> days = utils.setDayOrder(calendar.get(Calendar.DAY_OF_WEEK));
+        List<AxisValue> date = new ArrayList<>();
+        for(int i= 0; i < days.size(); i++){
+            date.add(new AxisValue(i).setLabel(utils.getDayName(days.get(i))));
+        }
 
-            @Override
-            public void onValueDeselected() {
-                // Nothing.
-            }
-        });
-
-        data.setLines(lines);
-        graph.setLineChartData(data);
+        data = new ColumnChartData(columns);
+        Axis axisX = new Axis();
+        axisX.setMaxLabelChars(4);
+        axisX.setValues(date);
+        data.setAxisXBottom(axisX);
+        chart.setColumnChartData(data);
     }
 
-    private int initializeCurveColor()
-    {
-        Palette palette = Palette.from(DrawableHelper.drawableToBitmap(icon)).generate();
-        return palette.getVibrantColor(Color.parseColor("#000000"));
+    private void initializePieChart(){
+        pieChart = findViewById(R.id.PieChart);
+        int numValues = 7;
+        List<SliceValue> values = new ArrayList<>();
+        for (int i = 0; i < numValues; ++i) {
+            float data = ((float) times[i]/sumTimes)*100;
+            SliceValue sliceValue = new SliceValue(data, -13388315);
+            sliceValue.setLabel(df.format(data)+"%");
+            values.add(sliceValue);
+        }
+        pieData = new PieChartData(values);
+        pieData.setHasLabels(true);
+        pieData.setHasLabelsOutside(true);
+        pieData.setHasCenterCircle(true);
+
+        pieChart.setPieChartData(pieData);
     }
+
+
 
     /************************************************
      *************** Week methods *******************
@@ -180,41 +209,4 @@ public class GraphTimeActivity extends AppCompatActivity
         }
     }
 
-    /************************************************
-     *************** Month methods ******************
-     ***********************************************/
-
-    private Axis initializeMonthAxisX()
-    {
-        Axis x = new Axis();
-
-        List<AxisValue> x_values = new ArrayList<>();
-
-        String[] labels = CalendarHelper.pastDaysOfTheMonth();
-        for(int i = 0; i < labels.length; i++)
-        {
-            x_values.add(new AxisValue(i).setLabel(labels[i]));
-        }
-
-        x.setValues(x_values);
-
-        return x;
-    }
-
-    private void generateTimesMonth()
-    {
-        times = new long[10];
-
-        UsageTimeProvider provider = new UsageTimeProvider(this);
-
-        for(int i = times.length - 1, index = 0; i >= 0; i--, index++)
-        {
-            Calendar c1 = Calendar.getInstance();
-            c1.add(Calendar.DATE, (-i - 1) * 3);
-            Calendar c2 = Calendar.getInstance();
-            c2.add(Calendar.DATE, -i * 3);
-
-            times[index] = provider.getAppUsageTime(packageName, c1, c2);
-        }
-    }
 }

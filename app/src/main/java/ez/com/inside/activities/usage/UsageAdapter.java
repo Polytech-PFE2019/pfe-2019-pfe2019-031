@@ -26,20 +26,14 @@ public class UsageAdapter extends RecyclerView.Adapter<UsageAdapter.ViewHolder>
     static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         private ImageView icon;
-        private TextView appNameView;
-        private TextView usageRateView;
         private TextView usageTimeView;
-        private CardView card;
         private OnClickListenerTransition clickListener;
 
         public ViewHolder(View itemView, OnClickListenerTransition clickListener)
         {
             super(itemView);
-            this.appNameView = itemView.findViewById(R.id.appName);
-            this.usageRateView = itemView.findViewById(R.id.appUsageRate);
             this.usageTimeView = itemView.findViewById(R.id.appUsageTime);
             this.icon = itemView.findViewById(R.id.appIcon);
-            this.card = itemView.findViewById(R.id.card);
 
             this.clickListener = clickListener;
             itemView.setOnClickListener(this);
@@ -47,7 +41,7 @@ public class UsageAdapter extends RecyclerView.Adapter<UsageAdapter.ViewHolder>
 
         @Override
         public void onClick(View v) {
-            clickListener.onClick(appNameView, icon, getAdapterPosition());
+            clickListener.onClick(usageTimeView, icon, getAdapterPosition());
         }
     }
 
@@ -70,17 +64,9 @@ public class UsageAdapter extends RecyclerView.Adapter<UsageAdapter.ViewHolder>
     public void onBindViewHolder(ViewHolder holder, int position)
     {
         AppUsage item = dataset.get(position);
-
-        holder.appNameView.setText(item.appName);
-
-        DecimalFormat format = new DecimalFormat("#.#");
-
-        holder.usageRateView.setText(format.format(item.usageRate) + "%");
         holder.usageTimeView.setText(TimeFormatHelper.minutesToHours(item.usageTime));
-
         holder.icon.setImageDrawable(item.icon);
 
-        holder.card.setCardBackgroundColor(dataset.get(position).color[1]);
     }
 
     @Override

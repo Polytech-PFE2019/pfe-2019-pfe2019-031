@@ -11,6 +11,7 @@ import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import ez.com.inside.R;
 import ez.com.inside.business.helpers.PackagesSingleton;
 import ez.com.inside.business.usagerate.UsageRateProviderImpl;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
+import ez.com.inside.business.usagetime.Utils;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
@@ -53,7 +55,7 @@ public class WeeklyFragment extends Fragment
 
     private ColumnChartView chart;
     private ColumnChartData data;
-
+    private Utils utils = new Utils();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,37 +75,21 @@ public class WeeklyFragment extends Fragment
         catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        generateColors();
-        generateDefaultData();
 
+        generateDefaultData();
         initializeRecyclerView();
     }
 
-    private void generateColors()
-    {
-        int i = 0;
-        for(int j = 0; j < usages.size(); j++)
-        {
-            if(usages.get(j).usageRate > 2)
-            {
-                usages.get(j).color = COLOR_PANEL[i++ % COLOR_PANEL.length];
-            }
-            else
-            {
-                usages.get(j).color = COLOR_OTHER;
-            }
-        }
-    }
+
 
     private void generateDefaultData() {
-        int numSubcolumns = 1;
         int numColumns = 7;
 
         List<Column> columns = new ArrayList<Column>();
         List<SubcolumnValue> values;
 
         times = new long[7];
-
+        int sum = 0;
         UsageTimeProvider provider = new UsageTimeProvider(getContext());
         for(AppUsage usage : usages)
         {
@@ -114,26 +100,24 @@ public class WeeklyFragment extends Fragment
                 Calendar c2 = Calendar.getInstance();
                 c2.add(Calendar.DATE, -i);
                 times[index] += provider.getAppUsageTime(usage.packageName, c1, c2);
+                sum += times[index];
             }
         }
 
 
         for (int i = 0; i < numColumns; ++i) {
             values = new ArrayList<>();
-            for (int j = 0; j < numSubcolumns; ++j) {
-                //Create bar with the current value
-                values.add(new SubcolumnValue( times[i]/60, ChartUtils.pickColor()));
-            }
+            values.add(new SubcolumnValue( times[i]/60, -13388315));
             Column column = new Column(values);
             column.setHasLabels(true);
             columns.add(column);
         }
 
         Calendar calendar = Calendar.getInstance();
-        List<Integer> days = setDayOrder(calendar.get(Calendar.DAY_OF_WEEK));
+        List<Integer> days = utils.setDayOrder(calendar.get(Calendar.DAY_OF_WEEK));
         List<AxisValue> date = new ArrayList<>();
         for(int i= 0; i < days.size(); i++){
-            date.add(new AxisValue(i).setLabel(getDayName(days.get(i))));
+            date.add(new AxisValue(i).setLabel(utils.getDayName(days.get(i))));
         }
 
         data = new ColumnChartData(columns);
@@ -143,57 +127,13 @@ public class WeeklyFragment extends Fragment
         data.setAxisXBottom(axisX);
         chart.setColumnChartData(data);
 
+
+       TextView average = getView().findViewById(R.id.moyenne_hebdo);
+       average.setText("Moyenne hebdomadaire " + (sum/60)/7 + "h");
+
     }
 
-    private List<Integer> setDayOrder(int firstDay){
-        List<Integer> values = new ArrayList<>();
-        int temp = 1;
-        Boolean restart = false;
-        for(int index = 1; index < 7; index ++){
-            if(firstDay+index == 7){
-                values.add(firstDay+index);
-                restart = true;
 
-            } else if (firstDay == 7) {
-                restart = true;
-            }
-
-
-            if(restart){
-                values.add(temp);
-                temp++;
-            }
-            else{
-                values.add(firstDay+index);
-            }
-        }
-
-        if(values.size() == 6){
-            values.add(7);
-        }
-        return values;
-    }
-
-    private String getDayName(int value){
-        switch (value){
-            case 1:
-                return "Dim.";
-            case 2:
-                return "Lun.";
-            case 3:
-                return "Mar.";
-            case 4:
-                return "Mer.";
-            case 5:
-                return "Jeu.";
-            case 6:
-                return "Ven.";
-            case 7:
-                return "Sam.";
-
-        }
-        return "";
-    }
 
     private void generateUsages(int nbDays) throws PackageManager.NameNotFoundException
     {
@@ -250,6 +190,7 @@ public class WeeklyFragment extends Fragment
                 intent.putExtra(EXTRA_APPNAME, usages.get(position).appName);
                 intent.putExtra(EXTRA_APPPKGNAME, usages.get(position).packageName);
                 intent.putExtra(EXTRA_GRAPHMODE, GraphMode.WEEKLY);
+                intent.putExtra("TIMES", times);
 
                 View sharedViewAppName = appNameView;
                 String transitionNameAppName = getString(R.string.transition_appName);
