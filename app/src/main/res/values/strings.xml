@@ -40,4 +40,8 @@
         cliquant sur \"Autorisation\".</string>
 
     <string name="network_totalValue_string">Total des données consommées :</string>
+
+    <string name="most_used_app">Les 5 applications les plus utilisées</string>
+    <string name="screening_time">Temps d\'écran total</string>
+    <string name="correspond_to">Correspond à :</string>
 </resources>

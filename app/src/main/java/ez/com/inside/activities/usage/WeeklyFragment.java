@@ -70,7 +70,7 @@ public class WeeklyFragment extends Fragment
     {
         super.onActivityCreated(savedInstanceState);
         try {
-            generateUsages(8);
+            generateUsages(7);
         }
         catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -100,7 +100,7 @@ public class WeeklyFragment extends Fragment
                 Calendar c2 = Calendar.getInstance();
                 c2.add(Calendar.DATE, -i);
                 times[index] += provider.getAppUsageTime(usage.packageName, c1, c2);
-                sum += times[index];
+
             }
         }
 
@@ -108,6 +108,7 @@ public class WeeklyFragment extends Fragment
         for (int i = 0; i < numColumns; ++i) {
             values = new ArrayList<>();
             values.add(new SubcolumnValue( times[i]/60, -13388315));
+            sum += times[i]/60;
             Column column = new Column(values);
             column.setHasLabels(true);
             columns.add(column);
@@ -129,7 +130,7 @@ public class WeeklyFragment extends Fragment
 
 
        TextView average = getView().findViewById(R.id.moyenne_hebdo);
-       average.setText("Moyenne hebdomadaire " + (sum/60)/7 + "h");
+       average.setText("Moyenne hebdomadaire " + sum/7 + "h");
 
     }
 

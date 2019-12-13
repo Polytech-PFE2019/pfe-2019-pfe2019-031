@@ -58,7 +58,7 @@ public class UsageActivity extends AppCompatActivity
     {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new WeeklyFragment(), "Semaine");
-        //adapter.addFragment(new MonthlyFragment(), "Mois");
+        adapter.addFragment(new MonthlyFragment(), "Mois");
         viewPager.setAdapter(adapter);
     }
 
