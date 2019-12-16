@@ -203,6 +203,7 @@ public class WeeklyFragment extends Fragment
                 intent.putExtra(EXTRA_APPNAME, usages.get(position).appName);
                 intent.putExtra(EXTRA_APPPKGNAME, usages.get(position).packageName);
                 intent.putExtra(EXTRA_GRAPHMODE, GraphMode.WEEKLY);
+                intent.putExtra("TOTALTIME", sum);
 
                 View sharedViewAppName = appNameView;
                 String transitionNameAppName = getString(R.string.transition_appName);

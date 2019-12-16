@@ -1,8 +1,5 @@
 package ez.com.inside.activities.usage;
 
-import android.app.usage.UsageStats;
-import android.app.usage.UsageStatsManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -11,23 +8,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
+import java.util.Locale;
 
 import ez.com.inside.R;
 import ez.com.inside.activities.helpers.TimeFormatHelper;
-import ez.com.inside.business.helpers.CalendarHelper;
-import ez.com.inside.business.helpers.PackagesSingleton;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
 import ez.com.inside.business.usagetime.Utils;
 import lecho.lib.hellocharts.model.Axis;
@@ -52,13 +43,13 @@ public class GraphTimeActivity extends AppCompatActivity
     private GraphMode graphMode;
 
     private long[] times;
-    private long[] completTimes;
+    private int totalTime;
 
     private Utils utils = new Utils();
 
     private PieChartView pieChart;
     private PieChartData pieData;
-    private long sumTimes;
+    private int currentDay;
     private static DecimalFormat df = new DecimalFormat("0.0");
 
     @Override
@@ -72,7 +63,7 @@ public class GraphTimeActivity extends AppCompatActivity
         graphMode = (GraphMode) intent.getSerializableExtra(UsageActivity.EXTRA_GRAPHMODE);
         appName = intent.getStringExtra(UsageActivity.EXTRA_APPNAME);
         packageName = intent.getStringExtra(UsageActivity.EXTRA_APPPKGNAME);
-        completTimes = intent.getLongArrayExtra("TIMES");
+        totalTime = intent.getIntExtra("TOTALTIME", 0);
 
         try{
             icon = getPackageManager().getApplicationIcon(packageName);
@@ -87,59 +78,64 @@ public class GraphTimeActivity extends AppCompatActivity
         ImageView iconView = findViewById(R.id.icon);
         iconView.setImageDrawable(icon);
 
-            initializeGraph();
-
+        Calendar c = Calendar.getInstance(Locale.FRANCE);
+        //Moins un pour que la semaine commence le lundi
+        currentDay  = c.get(Calendar.DAY_OF_WEEK) - 1;
+        if (currentDay == 0)
+            currentDay = 7;
+        initializeGraph();
 
         initializePieChart();
 
         TextView totalTimeView = findViewById(R.id.total_time);
 
-        long total = 0;
+        int total = 0;
         for(long time : times)
-            total += time;
+            total += (int) time;
 
         totalTimeView.setText(TimeFormatHelper.minutesToHours(total));
+        ProgressBar progressBar = findViewById(R.id.progressBar_graph_time);
+        float data = ((float)total/totalTime)*100;
+        progressBar.setProgress((int) data);
     }
 
     private void initializeGraph()
     {
         chart = findViewById(R.id.graph);
-        int numColumns = 7;
-
         List<Column> columns = new ArrayList<>();
         List<SubcolumnValue> values;
-
-        times = new long[7];
+        times = new long[currentDay];
 
         UsageTimeProvider provider = new UsageTimeProvider(this);
         for(int i = times.length - 1, index = 0; i >= 0; i--, index++)
         {
             Calendar c1 = Calendar.getInstance();
             c1.add(Calendar.DATE, -i - 1);
-
             Calendar c2 = Calendar.getInstance();
             c2.add(Calendar.DATE, -i);
-
             times[index] = provider.getAppUsageTime(packageName, c1, c2);
         }
 
-
-
-        for (int i = 0; i < numColumns; ++i) {
+        for (int i = 0; i < currentDay; ++i) {
             values = new ArrayList<>();
             values.add(new SubcolumnValue( times[i]/60, -13388315));
             Column column = new Column(values);
             column.setHasLabels(true);
             columns.add(column);
-            sumTimes += times[i];
+        }
+
+        for(int i = currentDay + 1 ; i <= 7; i++){
+            values = new ArrayList<>();
+            values.add(new SubcolumnValue(0, -13388315));
+            Column column = new Column(values);
+            column.setHasLabels(true);
+            columns.add(column);
         }
 
 
-        Calendar calendar = Calendar.getInstance();
-        List<Integer> days = utils.setDayOrder(calendar.get(Calendar.DAY_OF_WEEK));
         List<AxisValue> date = new ArrayList<>();
-        for(int i= 0; i < days.size(); i++){
-            date.add(new AxisValue(i).setLabel(utils.getDayName(days.get(i))));
+        for(int i= 1; i <= 7; i++){
+            date.add(new AxisValue(i-1).setLabel(utils.getDayName(i)));
         }
 
         data = new ColumnChartData(columns);
@@ -152,12 +148,11 @@ public class GraphTimeActivity extends AppCompatActivity
 
     private void initializePieChart(){
         pieChart = findViewById(R.id.PieChart);
-        int numValues = 7;
         List<SliceValue> values = new ArrayList<>();
-        for (int i = 0; i < numValues; ++i) {
-            float data = ((float) times[i]/sumTimes)*100;
+        for (int i = 0; i < currentDay; ++i) {
+            float data = ((float) times[i]/totalTime)*100;
             SliceValue sliceValue = new SliceValue(data, -13388315);
-            sliceValue.setLabel(df.format(data)+"%");
+            sliceValue.setLabel(utils.getDayName(i+1) + " " + df.format(data)+"%");
             values.add(sliceValue);
         }
         pieData = new PieChartData(values);

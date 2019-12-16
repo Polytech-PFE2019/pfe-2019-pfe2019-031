@@ -11,7 +11,10 @@
         android:id="@+id/appName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:text="TextView"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,11 +23,24 @@
         android:id="@+id/total_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.916"
         app:layout_constraintStart_toEndOf="@+id/icon"
+        app:layout_constraintTop_toBottomOf="@+id/appName" />
+
+    <ProgressBar
+        android:id="@+id/progressBar_graph_time"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="100dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appName" />
 
     <ImageView
@@ -32,14 +48,26 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
         android:scaleType="centerCrop"
         android:transitionName="@string/transition_appIcon"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appName" />
 
+    <View
+        android:id="@+id/view"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:background="#2C918F8F"
+        app:layout_constraintBottom_toTopOf="@+id/scrollView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar3"
+        app:layout_constraintVertical_bias="0.766" />
+
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="80dp"
@@ -52,8 +80,8 @@
 
             <lecho.lib.hellocharts.view.ColumnChartView
                 android:id="@+id/graph"
-                android:layout_width="353dp"
-                android:layout_height="216dp"
+                android:layout_width="342dp"
+                android:layout_height="119dp"
                 android:layout_marginTop="32dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
@@ -62,16 +90,28 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <lecho.lib.hellocharts.view.PieChartView
-                android:id="@+id/PieChart"
-                android:layout_width="193dp"
-                android:layout_height="206dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="48dp"
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:text="TextView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.459"
+                app:layout_constraintHorizontal_bias="0.501"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/graph" />
+
+            <lecho.lib.hellocharts.view.PieChartView
+                android:id="@+id/PieChart"
+                android:layout_width="0dp"
+                android:layout_height="246dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:padding="50dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
