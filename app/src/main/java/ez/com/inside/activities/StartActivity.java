@@ -230,7 +230,7 @@ public class StartActivity extends AppCompatActivity
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        RecyclerView.Adapter adapter = new DashboardAdapter(usages);
+        RecyclerView.Adapter adapter = new DashboardAdapter(usages, time);
         recyclerView.setAdapter(adapter);
 
         recyclerView.addItemDecoration(new ItemDecoration());

@@ -37,7 +37,6 @@ import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.PieChartData;
 import lecho.lib.hellocharts.model.SliceValue;
 import lecho.lib.hellocharts.model.SubcolumnValue;
-import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
 import lecho.lib.hellocharts.view.PieChartView;
 
@@ -168,45 +167,4 @@ public class GraphTimeActivity extends AppCompatActivity
 
         pieChart.setPieChartData(pieData);
     }
-
-
-
-    /************************************************
-     *************** Week methods *******************
-     ***********************************************/
-
-    private Axis initializeWeekAxisX()
-    {
-        Axis x = new Axis();
-
-        List<AxisValue> x_values = new ArrayList<>();
-
-        String[] labels = CalendarHelper.pastDaysOfTheWeek();
-        for(int i = 0; i < labels.length; i++)
-        {
-            x_values.add(new AxisValue(i).setLabel(labels[i]));
-        }
-
-        x.setValues(x_values);
-
-        return x;
-    }
-
-    private void generateTimesWeek()
-    {
-        times = new long[8];
-
-        UsageTimeProvider provider = new UsageTimeProvider(this);
-
-        for(int i = times.length - 1, index = 0; i >= 0; i--, index++)
-        {
-            Calendar c1 = Calendar.getInstance();
-            c1.add(Calendar.DATE, -i - 1);
-            Calendar c2 = Calendar.getInstance();
-            c2.add(Calendar.DATE, -i);
-
-            times[index] = provider.getAppUsageTime(packageName, c1, c2);
-        }
-    }
-
 }

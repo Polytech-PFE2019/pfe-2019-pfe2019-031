@@ -58,6 +58,8 @@ public class WeeklyFragment extends Fragment
     private Utils utils = new Utils();
     private int currentDay = 1;
     int sum = 0;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         usages = new ArrayList<>();
@@ -87,7 +89,7 @@ public class WeeklyFragment extends Fragment
         generateDefaultData();
 
         TextView average = getView().findViewById(R.id.moyenne_hebdo);
-        average.setText("Moyenne hebdomadaire " + sum/currentDay + "h");
+        average.setText("Moyenne hebdomadaire " + (sum/60)/currentDay + "h");
 
         initializeRecyclerView();
     }
@@ -117,7 +119,6 @@ public class WeeklyFragment extends Fragment
         for (int i = 0; i < currentDay; ++i) {
             values = new ArrayList<>();
             values.add(new SubcolumnValue( times[i]/60, -13388315));
-            sum += times[i]/60;
             Column column = new Column(values);
             column.setHasLabels(true);
             columns.add(column);
@@ -169,8 +170,9 @@ public class WeeklyFragment extends Fragment
 
             appUsage.usageTime = mapTimes.get(packageName);
 
-            appUsage.icon = getContext().getPackageManager().getApplicationIcon(packageName);
+            sum += appUsage.usageTime;
 
+            appUsage.icon = getContext().getPackageManager().getApplicationIcon(packageName);
             usages.add(appUsage);
         }
 
@@ -194,14 +196,13 @@ public class WeeklyFragment extends Fragment
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        RecyclerView.Adapter adapter = new UsageAdapter(usages, new OnClickListenerTransition() {
+        RecyclerView.Adapter adapter = new UsageAdapter(usages, sum, new OnClickListenerTransition() {
             @Override
             public void onClick(TextView appNameView, ImageView appIconView, int position) {
                 Intent intent = new Intent(getContext(), GraphTimeActivity.class);
                 intent.putExtra(EXTRA_APPNAME, usages.get(position).appName);
                 intent.putExtra(EXTRA_APPPKGNAME, usages.get(position).packageName);
                 intent.putExtra(EXTRA_GRAPHMODE, GraphMode.WEEKLY);
-                intent.putExtra("TIMES", times);
 
                 View sharedViewAppName = appNameView;
                 String transitionNameAppName = getString(R.string.transition_appName);

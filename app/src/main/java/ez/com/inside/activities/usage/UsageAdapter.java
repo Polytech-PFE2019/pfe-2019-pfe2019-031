@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -22,11 +23,12 @@ public class UsageAdapter extends RecyclerView.Adapter<UsageAdapter.ViewHolder>
 {
     private List<AppUsage> dataset;
     private final OnClickListenerTransition clickListener;
-
+    private int totalTime;
     static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         private ImageView icon;
         private TextView usageTimeView;
+        private ProgressBar progressBar;
         private OnClickListenerTransition clickListener;
 
         public ViewHolder(View itemView, OnClickListenerTransition clickListener)
@@ -34,7 +36,7 @@ public class UsageAdapter extends RecyclerView.Adapter<UsageAdapter.ViewHolder>
             super(itemView);
             this.usageTimeView = itemView.findViewById(R.id.appUsageTime);
             this.icon = itemView.findViewById(R.id.appIcon);
-
+            this.progressBar = itemView.findViewById(R.id.progressBar2);
             this.clickListener = clickListener;
             itemView.setOnClickListener(this);
         }
@@ -45,10 +47,11 @@ public class UsageAdapter extends RecyclerView.Adapter<UsageAdapter.ViewHolder>
         }
     }
 
-    public UsageAdapter(@NonNull List<AppUsage> rates, OnClickListenerTransition clickListener)
+    public UsageAdapter(@NonNull List<AppUsage> rates, int totalTime, OnClickListenerTransition clickListener)
     {
-        this.clickListener=clickListener;
+        this.clickListener = clickListener;
         this.dataset = rates;
+        this.totalTime = totalTime;
     }
 
     @Override
@@ -66,6 +69,8 @@ public class UsageAdapter extends RecyclerView.Adapter<UsageAdapter.ViewHolder>
         AppUsage item = dataset.get(position);
         holder.usageTimeView.setText(TimeFormatHelper.minutesToHours(item.usageTime));
         holder.icon.setImageDrawable(item.icon);
+        float data = ((float) item.usageTime/totalTime)*100;
+        holder.progressBar.setProgress((int) data);
 
     }
 
