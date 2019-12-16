@@ -41,19 +41,19 @@ public class Utils {
     public String getDayName(int value){
         switch (value){
             case 1:
-                return "Dim.";
-            case 2:
                 return "Lun.";
-            case 3:
+            case 2:
                 return "Mar.";
-            case 4:
+            case 3:
                 return "Mer.";
-            case 5:
+            case 4:
                 return "Jeu.";
-            case 6:
+            case 5:
                 return "Ven.";
-            case 7:
+            case 6:
                 return "Sam.";
+            case 7:
+                return "Dim.";
 
         }
         return "";

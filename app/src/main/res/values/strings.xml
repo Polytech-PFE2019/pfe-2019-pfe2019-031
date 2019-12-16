@@ -44,4 +44,7 @@
     <string name="most_used_app">Les 5 applications les plus utilisées</string>
     <string name="screening_time">Temps d\'écran total</string>
     <string name="correspond_to">Correspond à :</string>
+
+    <string name="dash_today">Aujourd\'hui,</string>
+    <string name="dash_data_title">Données Internet</string>
 </resources>

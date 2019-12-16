@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import ez.com.inside.R;
@@ -30,16 +31,15 @@ import ez.com.inside.business.helpers.PackagesSingleton;
 import ez.com.inside.business.usagerate.UsageRateProviderImpl;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
 import ez.com.inside.business.usagetime.Utils;
+
+
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.SubcolumnValue;
-import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
 
-import static ez.com.inside.activities.usage.UsageActivity.COLOR_OTHER;
-import static ez.com.inside.activities.usage.UsageActivity.COLOR_PANEL;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPNAME;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPPKGNAME;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_GRAPHMODE;
@@ -56,7 +56,8 @@ public class WeeklyFragment extends Fragment
     private ColumnChartView chart;
     private ColumnChartData data;
     private Utils utils = new Utils();
-
+    private int currentDay = 1;
+    int sum = 0;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         usages = new ArrayList<>();
@@ -69,27 +70,35 @@ public class WeeklyFragment extends Fragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
+        Calendar c = Calendar.getInstance(Locale.FRANCE);
+        //Moins un pour que la semaine commence le lundi
+        currentDay  = c.get(Calendar.DAY_OF_WEEK) - 1;
+        if (currentDay == 0)
+            currentDay = 7;
+
         try {
-            generateUsages(7);
+            generateUsages(currentDay);
         }
         catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
 
         generateDefaultData();
+
+        TextView average = getView().findViewById(R.id.moyenne_hebdo);
+        average.setText("Moyenne hebdomadaire " + sum/currentDay + "h");
+
         initializeRecyclerView();
     }
 
 
 
     private void generateDefaultData() {
-        int numColumns = 7;
-
         List<Column> columns = new ArrayList<Column>();
         List<SubcolumnValue> values;
 
-        times = new long[7];
-        int sum = 0;
+        times = new long[currentDay];
         UsageTimeProvider provider = new UsageTimeProvider(getContext());
         for(AppUsage usage : usages)
         {
@@ -105,7 +114,7 @@ public class WeeklyFragment extends Fragment
         }
 
 
-        for (int i = 0; i < numColumns; ++i) {
+        for (int i = 0; i < currentDay; ++i) {
             values = new ArrayList<>();
             values.add(new SubcolumnValue( times[i]/60, -13388315));
             sum += times[i]/60;
@@ -114,24 +123,25 @@ public class WeeklyFragment extends Fragment
             columns.add(column);
         }
 
-        Calendar calendar = Calendar.getInstance();
-        List<Integer> days = utils.setDayOrder(calendar.get(Calendar.DAY_OF_WEEK));
-        List<AxisValue> date = new ArrayList<>();
-        for(int i= 0; i < days.size(); i++){
-            date.add(new AxisValue(i).setLabel(utils.getDayName(days.get(i))));
+        for(int i = currentDay + 1 ; i <= 7; i++){
+            values = new ArrayList<>();
+            values.add(new SubcolumnValue(0, -13388315));
+            Column column = new Column(values);
+            column.setHasLabels(true);
+            columns.add(column);
         }
 
+
+        List<AxisValue> date = new ArrayList<>();
+        for(int i= 1; i <= 7; i++){
+            date.add(new AxisValue(i-1).setLabel(utils.getDayName(i)));
+        }
         data = new ColumnChartData(columns);
         Axis axisX = new Axis();
         axisX.setMaxLabelChars(4);
         axisX.setValues(date);
         data.setAxisXBottom(axisX);
         chart.setColumnChartData(data);
-
-
-       TextView average = getView().findViewById(R.id.moyenne_hebdo);
-       average.setText("Moyenne hebdomadaire " + sum/7 + "h");
-
     }
 
 
