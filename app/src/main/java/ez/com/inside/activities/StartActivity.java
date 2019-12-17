@@ -4,6 +4,7 @@ import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.wifi.WifiManager;
 import android.provider.Settings;
 
 import androidx.core.app.ActivityOptionsCompat;
@@ -41,6 +42,7 @@ import ez.com.inside.activities.usage.OnClickListenerTransition;
 import ez.com.inside.activities.usage.UsageActivity;
 import ez.com.inside.activities.usage.UsageAdapter;
 import ez.com.inside.business.helpers.PackagesSingleton;
+import ez.com.inside.business.network.Utils;
 import ez.com.inside.business.usagerate.UsageRateProviderImpl;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
 import ez.com.inside.dialogs.AuthorisationDialog;
@@ -79,11 +81,12 @@ public class StartActivity extends AppCompatActivity
         String[]monthName={"Janvier","Fevrier","Mars", "Avril", "Mai", "Juin", "Juillet",
                 "Août", "Septembre", "Octobre", "Novembre", "Decembre"};
         String text = c.get(Calendar.DAY_OF_MONTH) + " " + monthName[c.get(Calendar.MONTH)];
-        dashDate.setText(text);
-        dashDate2.setText(text);
-        dashDate3.setText(text);
+        dashDate.setText("Aujourd\'hui," + text);
+        dashDate2.setText("Aujourd\'hui," + text);
+        dashDate3.setText("Aujourd\'hui," + text);
 
         initializeRecyclerView();
+        getWifiLevel();
     }
 
     private boolean hasUsageStatsPermission()
@@ -159,6 +162,19 @@ public class StartActivity extends AppCompatActivity
 
     public void onClickNetworkActivity(View v){
         startActivity(new Intent(this, NetworkActivity.class));
+    }
+
+    private void getWifiLevel()
+    {
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        int linkSpeed = wifiManager.getConnectionInfo().getRssi();
+        int levelCurrentW = WifiManager.calculateSignalLevel(linkSpeed, 5);
+        Utils utils = new Utils();
+        TextView type = findViewById(R.id.WifiType);
+        type.setText("Wifi");
+        TextView name = findViewById(R.id.WifiName);
+        name.setText(wifiManager.getConnectionInfo().getSSID());
+        utils.setWifiText(levelCurrentW, (TextView) findViewById(R.id.WifiLevel));
     }
 
     private int generateUsages(int nbDays) throws PackageManager.NameNotFoundException

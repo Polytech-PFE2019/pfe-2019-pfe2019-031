@@ -3,11 +3,11 @@ package ez.com.inside.activities.network;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.util.Pair;
@@ -23,15 +24,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ez.com.inside.R;
-import ez.com.inside.activities.usage.GraphMode;
-import ez.com.inside.activities.usage.GraphTimeActivity;
 import ez.com.inside.business.network.Utils;
 import ez.com.inside.business.network.Wifi;
 import ez.com.inside.business.network.WifiDatabase;
-
-import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPNAME;
-import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPPKGNAME;
-import static ez.com.inside.activities.usage.UsageActivity.EXTRA_GRAPHMODE;
 
 public class WifiFragment extends Fragment {
     private WifiDatabase db;
@@ -39,7 +34,7 @@ public class WifiFragment extends Fragment {
     private WifiManager wifiManager;
     private Button addWifi;
     private Utils utils = new Utils();
-
+    private List<Wifi> wifis;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
@@ -48,7 +43,7 @@ public class WifiFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
 
@@ -68,6 +63,7 @@ public class WifiFragment extends Fragment {
                 String formattedDate = df.format(c);
                 wifi.date =  formattedDate;
                 db.wifiDao().InsertAll(wifi);
+                wifis.add(wifi);
 
             }
         });
@@ -97,23 +93,24 @@ public class WifiFragment extends Fragment {
     }
 
 
-
-
     private void setRecycleView(){
-        List<Wifi> wifis = db.wifiDao().getAll();
+        wifis = db.wifiDao().getAll();
 
         List<Wifi> newWifis = new ArrayList<>();
         for(int i=0; i < wifis.size(); i ++){
             int position = addWifi(wifis.get(i), newWifis);
 
-            if( position == -2)
+            if( position == -2) {
                 newWifis.add(wifis.get(i));
-            else if(position == -1)
+                newWifis.get(newWifis.indexOf(wifis.get(i))).addWifi(wifis.get(i));
+            }
+            else if(position == -1) {
                 newWifis.add(wifis.get(i));
+                newWifis.get(newWifis.indexOf(wifis.get(i))).addWifi(wifis.get(i));
+            }
             else
                 newWifis.get(position).addWifi(wifis.get(i));
         }
-
 
         RecyclerView recyclerView = getView().findViewById(R.id.recycleViewWifi);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -123,7 +120,7 @@ public class WifiFragment extends Fragment {
             @Override
             public void onClick(TextView name, int position) {
                 Intent intent = new Intent(getContext(), WifiHistoricActivity.class);
-                intent.putExtra("HELOO", "Hello");
+                intent.putExtra("wifi", wifis.get(position));
 
                 View sharedViewAppName = name;
                 String transitionNameAppName = getString(R.string.transition_appName);
@@ -139,8 +136,8 @@ public class WifiFragment extends Fragment {
 
     /**
      *
-     * @param wifi
-     * @param wifis
+     * @param wifi en cours
+     * @param wifis list des wifis
      * @return -2 si la liste est vide, -1 si la wifi n'est pas dans la liste
      * retourne int si la wifi est dans la liste
      */

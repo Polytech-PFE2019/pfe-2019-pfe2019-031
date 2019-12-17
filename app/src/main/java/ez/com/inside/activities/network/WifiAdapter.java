@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import ez.com.inside.R;
@@ -26,7 +27,7 @@ public class WifiAdapter extends RecyclerView.Adapter<WifiAdapter.MyViewHolder>{
         public ConstraintLayout layout;
         private OnClickListenerTransition clickListener;
 
-        public MyViewHolder(ConstraintLayout v, OnClickListenerTransition clickListener) {
+        protected MyViewHolder(ConstraintLayout v, OnClickListenerTransition clickListener) {
             super(v);
             this.name = v.findViewById(R.id.wifi_item_name);
             this.level = v.findViewById(R.id.wifi_item_signal);
@@ -41,13 +42,14 @@ public class WifiAdapter extends RecyclerView.Adapter<WifiAdapter.MyViewHolder>{
         }
     }
 
-    public WifiAdapter(List<Wifi> wifis, OnClickListenerTransition clickListener) {
+    protected WifiAdapter(List<Wifi> wifis, OnClickListenerTransition clickListener) {
         this.wifis = wifis;
         this.clickListener = clickListener;
     }
 
 
     @Override
+    @NonNull
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         ConstraintLayout v = (ConstraintLayout) LayoutInflater.from(parent.getContext())
@@ -66,6 +68,7 @@ public class WifiAdapter extends RecyclerView.Adapter<WifiAdapter.MyViewHolder>{
         for (int i = 0; i < item.getWifiSameName().size(); i++) {
             sum += item.getWifiSameName().get(i).level;
         }
+
         int average = sum / item.getWifiSameName().size();
         utils.setWifiText(average,holder.level);
 

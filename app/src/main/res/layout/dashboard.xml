@@ -2,16 +2,17 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
 
         <include
+            android:id="@+id/include3"
             layout="@layout/dashboard_usage"
             android:layout_width="371dp"
             android:layout_height="224dp"
@@ -22,115 +23,26 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardView2"
-            android:layout_width="0dp"
-            android:layout_height="210dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="16dp"
-            app:cardBackgroundColor="#255F5C5C"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="1dp"
+        <include
+            android:id="@+id/include4"
+            layout="@layout/dashboard_permission"
+            android:layout_width="371dp"
+            android:layout_height="224dp"
+            android:layout_marginTop="28dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.488"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardView">
+            app:layout_constraintTop_toBottomOf="@+id/include3" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout3"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#005E5656"
-                android:onClick="onClickApplicationsAuthorizationsActivity">
-
-                <TextView
-                    android:id="@+id/dashtitrepermission"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/dialog_authorisation_title"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/textView9"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="120dp"
-                    android:layout_marginTop="7dp"
-                    android:text="@string/dash_today"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/dashtitrepermission" />
-
-                <TextView
-                    android:id="@+id/dashDate2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:text="TextView"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/textView9"
-                    app:layout_constraintTop_toBottomOf="@+id/dashtitrepermission" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="210dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="16dp"
-            app:cardBackgroundColor="#25353131"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="1dp"
+        <include
+            layout="@layout/dashboard_wifi"
+            android:layout_width="371dp"
+            android:layout_height="224dp"
+            android:layout_marginTop="28dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.534"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardView2">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:onClick="onClickNetworkActivity">
-
-                <TextView
-                    android:id="@+id/textView10"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="120dp"
-                    android:layout_marginTop="7dp"
-                    android:text="@string/dash_today"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/dashtitredata" />
-
-                <TextView
-                    android:id="@+id/dashDate3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:text="TextView"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/textView10"
-                    app:layout_constraintTop_toBottomOf="@+id/dashtitredata" />
-
-                <TextView
-                    android:id="@+id/dashtitredata"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/dash_data_title"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.cardview.widget.CardView>
+            app:layout_constraintTop_toBottomOf="@+id/include4" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

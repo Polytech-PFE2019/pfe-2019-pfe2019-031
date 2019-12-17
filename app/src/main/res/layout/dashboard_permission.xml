@@ -7,6 +7,7 @@
     android:layout_marginStart="16dp"
     android:layout_marginTop="24dp"
     android:layout_marginEnd="16dp"
+    android:onClick="onClickApplicationsAuthorizationsActivity"
     app:cardBackgroundColor="#25353131"
     app:cardCornerRadius="20dp"
     app:cardElevation="1dp">
@@ -16,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#00312C2C"
-        android:onClick="onClickApplicationsUsageActivity"
+        android:onClick="onClickApplicationsAuthorizationsActivity"
         android:visibility="visible">
 
 
@@ -25,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@string/card_usage_title"
+            android:text="@string/dialog_authorisation_title"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -34,46 +35,16 @@
 
 
         <TextView
-            android:id="@+id/dashDate"
+            android:id="@+id/dashDate2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:onClick="onClickApplicationsAuthorizationsActivity"
             android:text="TextView"
             android:textColor="@color/colorAccent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dashtitreusage" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list_usage"
-            android:layout_width="310dp"
-            android:layout_height="128dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.492"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dashDate" />
-
-        <TextView
-            android:id="@+id/textView12"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="4dp"
-            android:text="@string/screening_time"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/list_usage" />
-
-        <TextView
-            android:id="@+id/dashtotaltime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="TextView"
-            android:textColor="@color/colorAccent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.742"
-            app:layout_constraintStart_toEndOf="@+id/textView12"
-            app:layout_constraintTop_toBottomOf="@+id/list_usage" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

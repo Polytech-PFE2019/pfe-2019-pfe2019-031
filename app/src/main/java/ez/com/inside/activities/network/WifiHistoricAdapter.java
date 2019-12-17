@@ -1,44 +1,47 @@
 package ez.com.inside.activities.network;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import ez.com.inside.R;
+import ez.com.inside.business.network.Utils;
 import ez.com.inside.business.network.Wifi;
 
 public class WifiHistoricAdapter extends RecyclerView.Adapter<WifiHistoricAdapter.MyViewHolder> {
 
     private List<Wifi> wifis;
+    private Utils utils = new Utils();
 
-
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
-
+    protected static class MyViewHolder extends RecyclerView.ViewHolder {
 
         private TextView level;
         private TextView date;
         private ConstraintLayout layout;
-        public MyViewHolder(ConstraintLayout v ) {
+
+        protected MyViewHolder(ConstraintLayout v ) {
             super(v);
             this.level = v.findViewById(R.id.historic_level);
             this.date = v.findViewById(R.id.historic_date);
 
-            layout = v;
+            this.layout = v;
         }
     }
 
-    public WifiHistoricAdapter(List<Wifi> wifis) {
+    protected WifiHistoricAdapter(List<Wifi> wifis) {
         this.wifis = wifis;
     }
 
 
     @Override
+    @NonNull
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view
         ConstraintLayout v = (ConstraintLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.wifi_historic_item, parent, false);
 
@@ -49,7 +52,7 @@ public class WifiHistoricAdapter extends RecyclerView.Adapter<WifiHistoricAdapte
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Wifi item = wifis.get(position);
         holder.date.setText(item.date);
-        holder.level.setText(item.level);
+        utils.setWifiText(item.level, holder.level);
     }
 
     @Override

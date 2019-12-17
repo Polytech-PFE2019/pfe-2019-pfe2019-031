@@ -1,5 +1,6 @@
 package ez.com.inside.business.network;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +11,11 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity
-public class Wifi {
+public class Wifi implements Serializable {
 
     @PrimaryKey (autoGenerate = true)
     @NonNull
-    public Integer key;
+    protected Integer key;
 
     @ColumnInfo (name = "name")
     @NonNull
@@ -27,9 +28,11 @@ public class Wifi {
     public String date;
 
     @Ignore
-    private List<Wifi> wifiSameName = new ArrayList<>();
+    private List<Wifi> wifiSameName;
 
     public void addWifi(Wifi wifi){
+        if(wifiSameName == null)
+            wifiSameName = new ArrayList<>();
         wifiSameName.add(wifi);
     }
 
