@@ -14,7 +14,7 @@ public interface WifiDao {
     List<Wifi> getAll();
 
     @Query("SELECT * FROM wifi WHERE name LIKE :first")
-    Wifi findByName(String first);
+    List<Wifi> findByName(String first);
 
     @Insert
     void InsertAll(Wifi... wifis);

@@ -40,6 +40,7 @@
         cliquant sur \"Autorisation\".</string>
 
     <string name="network_totalValue_string">Total des données consommées :</string>
+    <string name="save_wifi">Enregister la wifi</string>
 
     <string name="most_used_app">Les 5 applications les plus utilisées</string>
     <string name="screening_time">Temps d\'écran total</string>
