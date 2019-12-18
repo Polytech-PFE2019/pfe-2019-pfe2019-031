@@ -8,7 +8,7 @@
     android:layout_marginTop="24dp"
     android:layout_marginEnd="16dp"
     android:onClick="onClickNetworkActivity"
-    app:cardBackgroundColor="#25353131"
+    app:cardBackgroundColor="#99EFF1F3"
     app:cardCornerRadius="20dp"
     app:cardElevation="1dp">
 
@@ -41,6 +41,7 @@
             android:layout_marginTop="4dp"
             android:text="TextView"
             android:textColor="@color/colorAccent"
+            android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dashtitreusage" />
@@ -51,6 +52,7 @@
             android:layout_height="99dp"
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.142"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dashDate3" />
 

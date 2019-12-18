@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="210dp"
@@ -8,7 +9,7 @@
     android:layout_marginTop="24dp"
     android:layout_marginEnd="16dp"
     android:onClick="onClickApplicationsAuthorizationsActivity"
-    app:cardBackgroundColor="#25353131"
+    app:cardBackgroundColor="#9AEFF1F3"
     app:cardCornerRadius="20dp"
     app:cardElevation="1dp">
 
@@ -42,9 +43,21 @@
             android:onClick="onClickApplicationsAuthorizationsActivity"
             android:text="TextView"
             android:textColor="@color/colorAccent"
+            android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dashtitreusage" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycleView"
+            android:layout_width="0dp"
+            android:layout_height="139dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dashDate2" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

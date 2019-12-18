@@ -29,7 +29,7 @@ public class PermissionsGroupActivity extends AppCompatActivity {
     }
 
     private void initializeRecyclerView(){
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.PermissionsGroupActivity_RecyclerView);
+        RecyclerView recyclerView = findViewById(R.id.PermissionsGroupActivity_RecyclerView);
         recyclerView.setHasFixedSize(true);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);

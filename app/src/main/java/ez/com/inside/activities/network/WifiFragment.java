@@ -35,10 +35,14 @@ public class WifiFragment extends Fragment {
     private Button addWifi;
     private Utils utils = new Utils();
     private List<Wifi> wifis;
+    private WifiAdapter wifiAdapter;
+    List<Wifi> newWifis = new ArrayList<>();
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
+
         return inflater.inflate(R.layout.fragment_wifi, container, false);
     }
 
@@ -49,10 +53,14 @@ public class WifiFragment extends Fragment {
 
         db = WifiDatabase.getInstance(getView().getContext());
         addWifi = getView().findViewById(R.id.saveWifi);
+        setWifiListFromBDD();
         setRecycleView();
+
+
         addWifi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //db.wifiDao().deleteAll();
                 Wifi wifi = new Wifi();
                 wifi.name = wifiManager.getConnectionInfo().getSSID();
                 wifi.level = levelCurrentW;
@@ -64,7 +72,8 @@ public class WifiFragment extends Fragment {
                 wifi.date =  formattedDate;
                 db.wifiDao().InsertAll(wifi);
                 wifis.add(wifi);
-
+                addWifi(wifi);
+                wifiAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -94,29 +103,11 @@ public class WifiFragment extends Fragment {
 
 
     private void setRecycleView(){
-        wifis = db.wifiDao().getAll();
-
-        List<Wifi> newWifis = new ArrayList<>();
-        for(int i=0; i < wifis.size(); i ++){
-            int position = addWifi(wifis.get(i), newWifis);
-
-            if( position == -2) {
-                newWifis.add(wifis.get(i));
-                newWifis.get(newWifis.indexOf(wifis.get(i))).addWifi(wifis.get(i));
-            }
-            else if(position == -1) {
-                newWifis.add(wifis.get(i));
-                newWifis.get(newWifis.indexOf(wifis.get(i))).addWifi(wifis.get(i));
-            }
-            else
-                newWifis.get(position).addWifi(wifis.get(i));
-        }
-
         RecyclerView recyclerView = getView().findViewById(R.id.recycleViewWifi);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        WifiAdapter wifiAdapter = new WifiAdapter(newWifis, new OnClickListenerTransition(){
+        wifiAdapter = new WifiAdapter(newWifis, new OnClickListenerTransition(){
             @Override
             public void onClick(TextView name, int position) {
                 Intent intent = new Intent(getContext(), WifiHistoricActivity.class);
@@ -134,6 +125,31 @@ public class WifiFragment extends Fragment {
         recyclerView.setAdapter(wifiAdapter);
     }
 
+    private void setWifiListFromBDD(){
+        wifis = db.wifiDao().getAll();
+        for(int i=0; i < wifis.size(); i++){
+            addWifi(wifis.get(i));
+        }
+    }
+
+    private void addWifi(Wifi wifi){
+        int position = canAddWifi(wifi, newWifis);
+
+        if( position == -2) {
+            newWifis.add(wifi);
+            newWifis.get(newWifis.indexOf(wifi)).addWifi(wifi);
+        }
+        else if(position == -1) {
+            newWifis.add(wifi);
+            newWifis.get(newWifis.indexOf(wifi)).addWifi(wifi);
+        }
+        else{
+            newWifis.get(position).addWifi(wifi);
+        }
+
+
+    }
+
     /**
      *
      * @param wifi en cours
@@ -141,7 +157,7 @@ public class WifiFragment extends Fragment {
      * @return -2 si la liste est vide, -1 si la wifi n'est pas dans la liste
      * retourne int si la wifi est dans la liste
      */
-    private int addWifi(Wifi wifi, List<Wifi> wifis){
+    private int canAddWifi(Wifi wifi, List<Wifi> wifis){
         if(wifis.size() == 0){
             return -2;
         }
@@ -150,6 +166,8 @@ public class WifiFragment extends Fragment {
                 return i;
             }
         }
+
+
         return -1;
     }
 

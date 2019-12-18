@@ -7,7 +7,8 @@
     android:layout_marginStart="16dp"
     android:layout_marginTop="24dp"
     android:layout_marginEnd="16dp"
-    app:cardBackgroundColor="#25353131"
+    android:onClick="onClickApplicationsUsageActivity"
+    app:cardBackgroundColor="#99EFF1F3"
     app:cardCornerRadius="20dp"
     app:cardElevation="1dp">
 
@@ -40,16 +41,20 @@
             android:layout_marginTop="4dp"
             android:text="TextView"
             android:textColor="@color/colorAccent"
+            android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dashtitreusage" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_usage"
-            android:layout_width="310dp"
-            android:layout_height="128dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.492"
+            android:layout_width="0dp"
+            android:layout_height="129dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="4dp"
+            android:onClick="onClickApplicationsUsageActivity"
+            app:layout_constraintEnd_toEndOf="@+id/dashtotaltime"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dashDate" />
 

@@ -30,8 +30,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ez.com.inside.R;
 import ez.com.inside.activities.helpers.TimeFormatHelper;
+import ez.com.inside.activities.listeners.OnClickListener;
 import ez.com.inside.activities.network.NetworkActivity;
 import ez.com.inside.activities.permissions.PermissionsActivity;
+import ez.com.inside.activities.permissions.PermissionsGroupActivity;
+import ez.com.inside.activities.permissions.PermissionsGroupAdapter;
 import ez.com.inside.activities.settings.SettingsActivity;
 import ez.com.inside.activities.usage.AppUsage;
 import ez.com.inside.activities.usage.DashboardAdapter;
@@ -43,6 +46,8 @@ import ez.com.inside.activities.usage.UsageActivity;
 import ez.com.inside.activities.usage.UsageAdapter;
 import ez.com.inside.business.helpers.PackagesSingleton;
 import ez.com.inside.business.network.Utils;
+import ez.com.inside.business.permission.PermissionGroupInfo;
+import ez.com.inside.business.permission.PermissionsFinder;
 import ez.com.inside.business.usagerate.UsageRateProviderImpl;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
 import ez.com.inside.dialogs.AuthorisationDialog;
@@ -86,6 +91,7 @@ public class StartActivity extends AppCompatActivity
         dashDate3.setText("Aujourd\'hui," + text);
 
         initializeRecyclerView();
+        setPermission();
         getWifiLevel();
     }
 
@@ -162,6 +168,15 @@ public class StartActivity extends AppCompatActivity
 
     public void onClickNetworkActivity(View v){
         startActivity(new Intent(this, NetworkActivity.class));
+    }
+
+    private void setPermission() {
+        RecyclerView recyclerView = findViewById(R.id.recycleView);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        List<PermissionGroupInfo> permissionGroupList = PermissionsFinder.getPermissionsGroupsInfo(this.getPackageManager());
+        RecyclerView.Adapter adapter = new DashboardPermissionAdapter(this, permissionGroupList);
+        recyclerView.setAdapter(adapter);
     }
 
     private void getWifiLevel()
