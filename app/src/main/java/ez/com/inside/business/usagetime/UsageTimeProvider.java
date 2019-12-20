@@ -4,7 +4,6 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -96,7 +95,7 @@ public class UsageTimeProvider {
      * @param dayOfWeek current day of week
      * @return List of string, package name of used app
      */
-    private List<String> getAppUsed(int dayOfWeek)
+    private List<String> getAppUsedWeek(int dayOfWeek)
     {
 
         List<String> appUsed = new ArrayList<>();
@@ -139,12 +138,13 @@ public class UsageTimeProvider {
      * @return a list of AppUsage for a week
      * @throws PackageManager.NameNotFoundException
      */
-    public List<AppUsage> setAdapterList(int dayOfWeek) throws PackageManager.NameNotFoundException {
+    public List<AppUsage> setAdapterListForWeek(int dayOfWeek) throws PackageManager.NameNotFoundException {
 
         List<AppUsage> usages = new ArrayList<>();
         UsageTimeProvider timeProvider = new UsageTimeProvider(context);
         PackagesSingleton singleton = PackagesSingleton.getInstance(context.getPackageManager());
-        List<String> packageNames = timeProvider.getAppUsed(dayOfWeek);
+        List<String> packageNames = timeProvider.getAppUsedWeek(dayOfWeek);
+
         for(int i= 0; i< packageNames.size(); i++) {
             AppUsage appUsage = new AppUsage(singleton.packageToAppName(packageNames.get(i)));
             appUsage.packageName = packageNames.get(i);
@@ -166,7 +166,8 @@ public class UsageTimeProvider {
 
                 appUsage.usageTime += timeProvider.getAppUsageTime(packageNames.get(i), beginning, end);
             }
-            usages.add(appUsage);
+            if(appUsage.usageTime > 0.1)
+                usages.add(appUsage);
         }
 
         Collections.sort(usages, new Comparator<AppUsage>() {
@@ -182,7 +183,6 @@ public class UsageTimeProvider {
 
         return  usages;
     }
-
 
     /**
      * @return the number of minutes spent in foreground of an app between c1 and c2.

@@ -7,8 +7,7 @@ import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
 
-import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.util.Pair;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,15 +15,11 @@ import androidx.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,28 +28,16 @@ import ez.com.inside.activities.helpers.TimeFormatHelper;
 import ez.com.inside.activities.listeners.OnClickListener;
 import ez.com.inside.activities.network.NetworkActivity;
 import ez.com.inside.activities.permissions.PermissionsActivity;
-import ez.com.inside.activities.permissions.PermissionsGroupActivity;
-import ez.com.inside.activities.permissions.PermissionsGroupAdapter;
 import ez.com.inside.activities.settings.SettingsActivity;
 import ez.com.inside.activities.usage.AppUsage;
 import ez.com.inside.activities.usage.DashboardAdapter;
-import ez.com.inside.activities.usage.GraphMode;
-import ez.com.inside.activities.usage.GraphTimeActivity;
 import ez.com.inside.activities.usage.ItemDecoration;
-import ez.com.inside.activities.usage.OnClickListenerTransition;
 import ez.com.inside.activities.usage.UsageActivity;
-import ez.com.inside.activities.usage.UsageAdapter;
-import ez.com.inside.business.helpers.PackagesSingleton;
 import ez.com.inside.business.network.Utils;
 import ez.com.inside.business.permission.PermissionGroupInfo;
 import ez.com.inside.business.permission.PermissionsFinder;
-import ez.com.inside.business.usagerate.UsageRateProviderImpl;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
 import ez.com.inside.dialogs.AuthorisationDialog;
-
-import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPNAME;
-import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPPKGNAME;
-import static ez.com.inside.activities.usage.UsageActivity.EXTRA_GRAPHMODE;
 
 public class StartActivity extends AppCompatActivity
 {
@@ -93,6 +76,7 @@ public class StartActivity extends AppCompatActivity
         initializeRecyclerView();
         setPermission();
         getWifiLevel();
+
     }
 
     private boolean hasUsageStatsPermission()
@@ -202,7 +186,7 @@ public class StartActivity extends AppCompatActivity
 
         UsageTimeProvider timeProvider = new UsageTimeProvider(getApplicationContext());
         try {
-            usages = timeProvider.setAdapterList(currentDay);
+            usages = timeProvider.setAdapterListForWeek(currentDay);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

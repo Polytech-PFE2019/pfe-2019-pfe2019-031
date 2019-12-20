@@ -28,8 +28,6 @@ import ez.com.inside.business.usagerate.UsageRateProviderImpl;
 import ez.com.inside.business.usagetime.CorrespondanceItem;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
 
-import lecho.lib.hellocharts.model.Axis;
-import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.SubcolumnValue;
@@ -46,6 +44,7 @@ public class MonthlyFragment extends Fragment {
     private ColumnChartData data;
     private long totaltime = 0;
     private List<AppUsage> usages;
+
 
     @Nullable
     @Override
@@ -67,7 +66,8 @@ public class MonthlyFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         String[]monthName={"Janvier","Fevrier","Mars", "Avril", "Mai", "Juin", "Juillet",
-                "Août", "Septembre", "Octobre", "Novembre", "Decembre"};
+                "Août", "Septembre", "Octobre", "Novembre", "Décembre"};
+
         Calendar c = Calendar.getInstance();
         String monthText = monthName[c.get(Calendar.MONTH)];
 
@@ -90,6 +90,7 @@ public class MonthlyFragment extends Fragment {
         setRecycleView();
         addAppVisual();
         generateDefaultData();
+        initializeRecyclerView();
 
     }
 
@@ -98,23 +99,17 @@ public class MonthlyFragment extends Fragment {
 
         List<Column> columns = new ArrayList<Column>();
         List<SubcolumnValue> values;
-        List<AxisValue> date = new ArrayList<>();
 
         for (int i = 0; i < numColumns; ++i) {
             values = new ArrayList<>();
             long time = usages.get(i).usageTime;
             values.add(new SubcolumnValue(time / 60, -13388315));
-            date.add(new AxisValue(i).setLabel(usages.get(i).appName));
             Column column = new Column(values);
             column.setHasLabels(true);
             columns.add(column);
         }
 
         data = new ColumnChartData(columns);
-        Axis axisX = new Axis();
-        axisX.setMaxLabelChars(10);
-        axisX.setValues(date);
-        data.setAxisXBottom(axisX);
         chart.setColumnChartData(data);
     }
 
@@ -197,6 +192,39 @@ public class MonthlyFragment extends Fragment {
                 return 0;
             }
         });
+    }
+
+    private void initializeRecyclerView()
+    {
+
+        UsageTimeProvider timeProvider = new UsageTimeProvider(getContext().getApplicationContext());
+        Calendar c = Calendar.getInstance();
+        try {
+            usages = timeProvider.setAdapterListForWeek(c.get(Calendar.DAY_OF_MONTH));
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        int time = 0;
+        for(int i=0; i < usages.size(); i++){
+            Log.d("data", usages.get(i).usageTime + "");
+            if(usages.get(i).usageTime < 2){
+                usages.remove(i);
+            }else {
+                time += usages.get(i).usageTime;
+            }
+        }
+
+        RecyclerView recyclerView = getView().findViewById(R.id.recycleViewUsage);
+        recyclerView.setHasFixedSize(true);
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext().getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+
+        RecyclerView.Adapter adapter = new DashboardAdapter(usages, time);
+        recyclerView.setAdapter(adapter);
+
+        recyclerView.addItemDecoration(new ItemDecoration());
     }
 
 

@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="217dp"
             android:layout_marginTop="20dp"
-            android:onClick="onClickApplicationsUsageActivity" />
+            android:focusable="auto" />
 
         <include
             android:id="@+id/dashboard_permission"

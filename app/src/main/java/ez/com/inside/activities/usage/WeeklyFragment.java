@@ -180,7 +180,7 @@ public class WeeklyFragment extends Fragment
 
         UsageTimeProvider timeProvider = new UsageTimeProvider(getContext());
         try {
-            usages = timeProvider.setAdapterList(currentDay);
+            usages = timeProvider.setAdapterListForWeek(currentDay);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

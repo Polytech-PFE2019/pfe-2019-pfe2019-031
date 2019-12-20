@@ -73,15 +73,14 @@
             android:id="@+id/constraintLayout"
             android:layout_width="332dp"
             android:layout_height="55dp"
-            android:layout_marginTop="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4">
+            app:layout_constraintTop_toBottomOf="@+id/graph">
 
             <ImageView
                 android:id="@+id/app1"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginStart="11dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -91,7 +90,7 @@
 
             <ImageView
                 android:id="@+id/app2"
-                android:layout_width="42dp"
+                android:layout_width="40dp"
                 android:layout_height="42dp"
                 android:layout_marginStart="28dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -101,7 +100,7 @@
 
             <ImageView
                 android:id="@+id/app3"
-                android:layout_width="42dp"
+                android:layout_width="40dp"
                 android:layout_height="42dp"
                 android:layout_marginStart="24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -111,8 +110,8 @@
 
             <ImageView
                 android:id="@+id/app4"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginStart="24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/app3"
@@ -121,7 +120,7 @@
 
             <ImageView
                 android:id="@+id/app5"
-                android:layout_width="42dp"
+                android:layout_width="40dp"
                 android:layout_height="42dp"
                 android:layout_marginStart="24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -136,13 +135,13 @@
             android:id="@+id/graph"
             android:layout_width="318dp"
             android:layout_height="209dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="8dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.494"
+            app:layout_constraintHorizontal_bias="0.505"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
         <TextView
             android:id="@+id/textView7"
@@ -154,6 +153,14 @@
             app:layout_constraintHorizontal_bias="0.059"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycleViewUsage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
