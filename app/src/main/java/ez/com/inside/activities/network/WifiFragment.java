@@ -138,12 +138,16 @@ public class WifiFragment extends Fragment {
         if( position == -2) {
             newWifis.add(wifi);
             newWifis.get(newWifis.indexOf(wifi)).addWifi(wifi);
+            Log.d("addWifi -2",   newWifis.get(newWifis.indexOf(wifi)).getWifiSameName().size() +" ");
+
         }
         else if(position == -1) {
             newWifis.add(wifi);
             newWifis.get(newWifis.indexOf(wifi)).addWifi(wifi);
+            Log.d("addWifi -1 ",   newWifis.get(newWifis.indexOf(wifi)).getWifiSameName().size() +" ");
         }
         else{
+            Log.d("addWifi",   newWifis.get(position).toString());
             newWifis.get(position).addWifi(wifi);
         }
 
@@ -159,14 +163,21 @@ public class WifiFragment extends Fragment {
      */
     private int canAddWifi(Wifi wifi, List<Wifi> wifis){
         if(wifis.size() == 0){
+
+            Log.d("canAddWifi",   "Wifi vide");
             return -2;
+
         }
         for(int i = 0; i < wifis.size(); i++){
             if(wifis.get(i).name.equals(wifi.name)){
+                Log.d("canAddWifi",   "Wifi ajoutée " + i );
+
                 return i;
+
             }
         }
 
+        Log.d("canAddWifi",   "Wifi pas dans la liste " );
 
         return -1;
     }

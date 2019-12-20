@@ -40,7 +40,6 @@ public class GraphTimeActivity extends AppCompatActivity
     private ColumnChartView chart;
     private ColumnChartData data;
 
-    private GraphMode graphMode;
 
     private long[] times;
     private int totalTime;
@@ -60,44 +59,23 @@ public class GraphTimeActivity extends AppCompatActivity
         setTitle("Suivi d\'utilisation");
 
         Intent intent = getIntent();
-        graphMode = (GraphMode) intent.getSerializableExtra(UsageActivity.EXTRA_GRAPHMODE);
         appName = intent.getStringExtra(UsageActivity.EXTRA_APPNAME);
         packageName = intent.getStringExtra(UsageActivity.EXTRA_APPPKGNAME);
         totalTime = intent.getIntExtra("TOTALTIME", 0);
-
-        try{
-            icon = getPackageManager().getApplicationIcon(packageName);
-        }
-        catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        TextView appNameView = findViewById(R.id.appName);
-        appNameView.setText(appName);
-
-        ImageView iconView = findViewById(R.id.icon);
-        iconView.setImageDrawable(icon);
 
         Calendar c = Calendar.getInstance(Locale.FRANCE);
         //Moins un pour que la semaine commence le lundi
         currentDay  = c.get(Calendar.DAY_OF_WEEK) - 1;
         if (currentDay == 0)
             currentDay = 7;
+
         initializeGraph();
-
         initializePieChart();
+        setHeader();
 
-        TextView totalTimeView = findViewById(R.id.total_time);
-
-        int total = 0;
-        for(long time : times)
-            total += (int) time;
-
-        totalTimeView.setText(TimeFormatHelper.minutesToHours(total));
-        ProgressBar progressBar = findViewById(R.id.progressBar_graph_time);
-        float data = ((float)total/totalTime)*100;
-        progressBar.setProgress((int) data);
     }
+
+
 
     private void initializeGraph()
     {
@@ -107,16 +85,29 @@ public class GraphTimeActivity extends AppCompatActivity
         times = new long[currentDay];
 
         UsageTimeProvider provider = new UsageTimeProvider(this);
-        for(int i = times.length - 1, index = 0; i >= 0; i--, index++)
+        int nbDay = 0;
+        for(int i = currentDay - 1; i >= 0; i--)
         {
-            Calendar c1 = Calendar.getInstance();
-            c1.add(Calendar.DATE, -i - 1);
-            Calendar c2 = Calendar.getInstance();
-            c2.add(Calendar.DATE, -i);
-            times[index] = provider.getAppUsageTime(packageName, c1, c2);
+            Calendar beginning = Calendar.getInstance();
+            beginning.set(Calendar.HOUR_OF_DAY, 0);
+            beginning.set(Calendar.MINUTE, 0);
+            beginning.set(Calendar.SECOND, 0);
+            beginning.set(Calendar.MILLISECOND, 0);
+            beginning.add(Calendar.DATE, -i);
+
+            Calendar end = Calendar.getInstance();
+            end.set(Calendar.HOUR_OF_DAY, 23);
+            end.set(Calendar.MINUTE, 59);
+            end.set(Calendar.SECOND, 59);
+            end.set(Calendar.MILLISECOND, 59);
+            end.add(Calendar.DATE, -i);
+
+            times[nbDay] = provider.getAppUsageTime(packageName, beginning, end);
+            nbDay ++;
+            Log.d("data i ", i + " " + times[i]);
         }
 
-        for (int i = 0; i < currentDay; ++i) {
+        for (int i = 0; i < currentDay; i++) {
             values = new ArrayList<>();
             values.add(new SubcolumnValue( times[i]/60, -13388315));
             Column column = new Column(values);
@@ -162,4 +153,33 @@ public class GraphTimeActivity extends AppCompatActivity
 
         pieChart.setPieChartData(pieData);
     }
+
+    private void setHeader(){
+
+        TextView appNameView = findViewById(R.id.appName);
+        appNameView.setText(appName);
+
+
+        try{
+            icon = getPackageManager().getApplicationIcon(packageName);
+        }
+        catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        ImageView iconView = findViewById(R.id.icon);
+        iconView.setImageDrawable(icon);
+
+
+
+        TextView totalTimeView = findViewById(R.id.total_time);
+        int total = 0;
+        for(long time : times)
+            total += (int) time;
+        totalTimeView.setText(TimeFormatHelper.minutesToHours(total));
+        ProgressBar progressBar = findViewById(R.id.progressBar_graph_time);
+        float data = ((float)total/totalTime)*100;
+        progressBar.setProgress((int) data);
+    }
+
 }

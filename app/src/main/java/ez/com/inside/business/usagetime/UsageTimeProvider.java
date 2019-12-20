@@ -4,6 +4,7 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -61,7 +62,13 @@ public class UsageTimeProvider {
 
         Calendar now = Calendar.getInstance();
         Calendar last = Calendar.getInstance();
-        last.add(Calendar.DATE,-days);
+        last.set(Calendar.HOUR_OF_DAY, 0);
+        last.set(Calendar.MINUTE, 0);
+        last.set(Calendar.SECOND, 0);
+        last.set(Calendar.MILLISECOND, 0);
+        last.add(Calendar.DATE, -days);
+
+       // Log.d("lassst ", last.toString());
 
         Map<String, UsageStats> stats = manager.queryAndAggregateUsageStats(last.getTimeInMillis(),now.getTimeInMillis());
 
@@ -79,6 +86,7 @@ public class UsageTimeProvider {
 
         return result;
     }
+
 
     /**
      * @return the number of minutes spent in foreground of an app between c1 and c2.

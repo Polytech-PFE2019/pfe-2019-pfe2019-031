@@ -1,5 +1,8 @@
 package ez.com.inside.activities.usage;
 
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -22,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -101,21 +105,19 @@ public class WeeklyFragment extends Fragment
         List<SubcolumnValue> values;
 
         times = new long[currentDay];
-        UsageTimeProvider provider = new UsageTimeProvider(getContext());
-        for(AppUsage usage : usages)
+        int nbDay = 0;
+        for(int i = currentDay - 1; i >= 0; i--)
         {
-            for(int i = times.length - 1, index = 0; i >= 0; i--, index++)
-            {
-                Calendar c1 = Calendar.getInstance();
-                c1.add(Calendar.DATE, -i - 1);
-                Calendar c2 = Calendar.getInstance();
-                c2.add(Calendar.DATE, -i);
-                times[index] += provider.getAppUsageTime(usage.packageName, c1, c2);
-
+            if(nbDay == 1){
+                times[i] = getUsageTime(nbDay);
             }
+            else {
+                times[i] = getUsageTime(nbDay);
+            }
+            nbDay ++;
         }
 
-
+        //Generate first part of graph => day of week until today
         for (int i = 0; i < currentDay; ++i) {
             values = new ArrayList<>();
             values.add(new SubcolumnValue( times[i]/60, -13388315));
@@ -124,6 +126,7 @@ public class WeeklyFragment extends Fragment
             columns.add(column);
         }
 
+        //Generate second part of graph => day until sunday starting tomorrow
         for(int i = currentDay + 1 ; i <= 7; i++){
             values = new ArrayList<>();
             values.add(new SubcolumnValue(0, -13388315));
@@ -143,6 +146,44 @@ public class WeeklyFragment extends Fragment
         axisX.setValues(date);
         data.setAxisXBottom(axisX);
         chart.setColumnChartData(data);
+    }
+
+
+    public long getUsageTime(int beginAt)
+    {
+        Calendar now = Calendar.getInstance();
+        Calendar last = Calendar.getInstance();
+        last.set(Calendar.HOUR_OF_DAY, 0);
+        last.set(Calendar.MINUTE, 0);
+        last.set(Calendar.SECOND, 0);
+        last.set(Calendar.MILLISECOND, 0);
+        last.add(Calendar.DATE, -beginAt);
+
+        now.set(Calendar.HOUR_OF_DAY, 23);
+        now.set(Calendar.MINUTE, 59);
+        now.set(Calendar.SECOND, 59);
+        now.set(Calendar.MILLISECOND, 59);
+        now.add(Calendar.DATE, -beginAt);
+
+        UsageStatsManager manager=(UsageStatsManager)getContext().getSystemService(Context.USAGE_STATS_SERVICE);
+        Map<String, UsageStats> stats = manager.queryAndAggregateUsageStats(last.getTimeInMillis(),now.getTimeInMillis());
+
+        PackagesSingleton helper = PackagesSingleton.getInstance( getContext().getPackageManager());
+
+        long timeSpend = 0;
+        for(Map.Entry<String, UsageStats> entry : stats.entrySet())
+        {
+            // If the package is not a launcher package, exclude it from the return result.
+            if(!helper.isLauncherPackage(entry.getKey()))
+                continue;
+
+            Log.d("data", entry.getKey() + " " + entry.getValue().getTotalTimeInForeground() );
+            timeSpend += entry.getValue().getTotalTimeInForeground() / 60000;
+
+        }
+
+        return timeSpend;
+
     }
 
 
@@ -202,7 +243,6 @@ public class WeeklyFragment extends Fragment
                 Intent intent = new Intent(getContext(), GraphTimeActivity.class);
                 intent.putExtra(EXTRA_APPNAME, usages.get(position).appName);
                 intent.putExtra(EXTRA_APPPKGNAME, usages.get(position).packageName);
-                intent.putExtra(EXTRA_GRAPHMODE, GraphMode.WEEKLY);
                 intent.putExtra("TOTALTIME", sum);
 
                 View sharedViewAppName = appNameView;
