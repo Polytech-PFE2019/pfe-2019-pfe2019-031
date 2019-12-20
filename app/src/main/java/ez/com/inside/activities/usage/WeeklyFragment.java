@@ -23,16 +23,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import ez.com.inside.R;
 import ez.com.inside.business.helpers.PackagesSingleton;
-import ez.com.inside.business.usagerate.UsageRateProviderImpl;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
 import ez.com.inside.business.usagetime.Utils;
 
@@ -46,7 +42,6 @@ import lecho.lib.hellocharts.view.ColumnChartView;
 
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPNAME;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPPKGNAME;
-import static ez.com.inside.activities.usage.UsageActivity.EXTRA_GRAPHMODE;
 
 /**
  * Created by Charly on 08/12/2017.
@@ -54,8 +49,9 @@ import static ez.com.inside.activities.usage.UsageActivity.EXTRA_GRAPHMODE;
 
 public class WeeklyFragment extends Fragment
 {
-    private List<AppUsage> usages;
+
     private long[] times;
+    private  List<AppUsage> usages;
 
     private ColumnChartView chart;
     private ColumnChartData data;
@@ -83,12 +79,6 @@ public class WeeklyFragment extends Fragment
         if (currentDay == 0)
             currentDay = 7;
 
-        try {
-            generateUsages(currentDay);
-        }
-        catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
 
         generateDefaultData();
 
@@ -109,11 +99,12 @@ public class WeeklyFragment extends Fragment
         for(int i = currentDay - 1; i >= 0; i--)
         {
             if(nbDay == 1){
-                times[i] = getUsageTime(nbDay);
+                times[i] = test(nbDay);
             }
             else {
-                times[i] = getUsageTime(nbDay);
+                times[i] = test(nbDay);
             }
+            sum += times[i];
             nbDay ++;
         }
 
@@ -149,7 +140,7 @@ public class WeeklyFragment extends Fragment
     }
 
 
-    public long getUsageTime(int beginAt)
+    public long test(int beginAt)
     {
         Calendar now = Calendar.getInstance();
         Calendar last = Calendar.getInstance();
@@ -168,7 +159,7 @@ public class WeeklyFragment extends Fragment
         UsageStatsManager manager=(UsageStatsManager)getContext().getSystemService(Context.USAGE_STATS_SERVICE);
         Map<String, UsageStats> stats = manager.queryAndAggregateUsageStats(last.getTimeInMillis(),now.getTimeInMillis());
 
-        PackagesSingleton helper = PackagesSingleton.getInstance( getContext().getPackageManager());
+        PackagesSingleton helper = PackagesSingleton.getInstance(getContext().getPackageManager());
 
         long timeSpend = 0;
         for(Map.Entry<String, UsageStats> entry : stats.entrySet())
@@ -179,58 +170,21 @@ public class WeeklyFragment extends Fragment
 
             Log.d("data", entry.getKey() + " " + entry.getValue().getTotalTimeInForeground() );
             timeSpend += entry.getValue().getTotalTimeInForeground() / 60000;
-
         }
-
         return timeSpend;
 
     }
 
-
-
-    private void generateUsages(int nbDays) throws PackageManager.NameNotFoundException
-    {
-        UsageRateProviderImpl rateProvider = new UsageRateProviderImpl(getContext());
-        Map<String, Double> mapRates = rateProvider.allUsageRates(nbDays);
-
-        UsageTimeProvider timeProvider = new UsageTimeProvider(getContext());
-        Map<String, Long> mapTimes = timeProvider.getUsageTime(nbDays);
-
-        PackagesSingleton singleton = PackagesSingleton.getInstance(getContext().getPackageManager());
-
-        for(Map.Entry<String, Double> entry : mapRates.entrySet())
-        {
-            if(entry.getValue() < 0.1)
-                continue;
-
-            String packageName = entry.getKey();
-
-            AppUsage appUsage = new AppUsage(singleton.packageToAppName(packageName));
-            appUsage.packageName = packageName;
-            appUsage.usageRate = entry.getValue();
-
-            appUsage.usageTime = mapTimes.get(packageName);
-
-            sum += appUsage.usageTime;
-
-            appUsage.icon = getContext().getPackageManager().getApplicationIcon(packageName);
-            usages.add(appUsage);
-        }
-
-        Collections.sort(usages, new Comparator<AppUsage>() {
-            @Override
-            public int compare(AppUsage appUsage, AppUsage t1) {
-                if(appUsage.usageRate < t1.usageRate)
-                    return 1;
-                if(appUsage.usageRate > t1.usageRate)
-                    return -1;
-                return 0;
-            }
-        });
-    }
-
     private void initializeRecyclerView()
     {
+
+        UsageTimeProvider timeProvider = new UsageTimeProvider(getContext());
+        try {
+            usages = timeProvider.setAdapterList(currentDay);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
         RecyclerView recyclerView = getView().findViewById(R.id.list_usage);
         recyclerView.setHasFixedSize(true);
 
@@ -263,4 +217,8 @@ public class WeeklyFragment extends Fragment
 
         recyclerView.addItemDecoration(new ItemDecoration());
     }
+
+
+
+
 }

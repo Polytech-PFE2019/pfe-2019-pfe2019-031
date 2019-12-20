@@ -192,49 +192,6 @@ public class StartActivity extends AppCompatActivity
         utils.setWifiText(levelCurrentW, (TextView) findViewById(R.id.WifiLevel));
     }
 
-    private int generateUsages(int nbDays) throws PackageManager.NameNotFoundException
-    {
-        UsageRateProviderImpl rateProvider = new UsageRateProviderImpl(getApplicationContext());
-        Map<String, Double> mapRates = rateProvider.allUsageRates(nbDays);
-
-        UsageTimeProvider timeProvider = new UsageTimeProvider(getApplicationContext());
-        Map<String, Long> mapTimes = timeProvider.getUsageTime(nbDays);
-
-        PackagesSingleton singleton = PackagesSingleton.getInstance(getApplicationContext().getPackageManager());
-
-        int time = 0;
-
-        for(Map.Entry<String, Double> entry : mapRates.entrySet())
-        {
-            if(entry.getValue() < 0.1)
-                continue;
-
-            String packageName = entry.getKey();
-
-            AppUsage appUsage = new AppUsage(singleton.packageToAppName(packageName));
-            appUsage.packageName = packageName;
-            appUsage.usageRate = entry.getValue();
-
-            appUsage.usageTime = mapTimes.get(packageName);
-
-            appUsage.icon = getApplicationContext().getPackageManager().getApplicationIcon(packageName);
-            time += appUsage.usageTime;
-            usages.add(appUsage);
-        }
-
-        Collections.sort(usages, new Comparator<AppUsage>() {
-            @Override
-            public int compare(AppUsage appUsage, AppUsage t1) {
-                if(appUsage.usageRate < t1.usageRate)
-                    return 1;
-                if(appUsage.usageRate > t1.usageRate)
-                    return -1;
-                return 0;
-            }
-        });
-
-        return time;
-    }
 
     private void initializeRecyclerView()
     {
@@ -243,11 +200,16 @@ public class StartActivity extends AppCompatActivity
         if (currentDay == 0)
             currentDay = 7;
 
-        int time = 0;
+        UsageTimeProvider timeProvider = new UsageTimeProvider(getApplicationContext());
         try {
-            time = generateUsages(currentDay);
+            usages = timeProvider.setAdapterList(currentDay);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
+        }
+
+        int time = 0;
+        for(int i=0; i < usages.size(); i++){
+            time += usages.get(i).usageTime;
         }
         usages = usages.subList(0,3);
 

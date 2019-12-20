@@ -6,10 +6,15 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import ez.com.inside.activities.usage.AppUsage;
 import ez.com.inside.business.helpers.PackagesSingleton;
 
 /**
@@ -21,6 +26,7 @@ public class UsageTimeProvider {
 
     private UsageStatsManager manager;
     private PackageManager pm;
+    private Context context;
 
     /**
      * Construct a UsageTimeProvider with a context.
@@ -29,6 +35,7 @@ public class UsageTimeProvider {
     public UsageTimeProvider(Context context){
         this.manager=(UsageStatsManager)context.getSystemService(Context.USAGE_STATS_SERVICE);
         this.pm = context.getPackageManager();
+        this.context = context;
     }
 
     /**
@@ -68,8 +75,6 @@ public class UsageTimeProvider {
         last.set(Calendar.MILLISECOND, 0);
         last.add(Calendar.DATE, -days);
 
-       // Log.d("lassst ", last.toString());
-
         Map<String, UsageStats> stats = manager.queryAndAggregateUsageStats(last.getTimeInMillis(),now.getTimeInMillis());
 
         PackagesSingleton helper = PackagesSingleton.getInstance(pm);
@@ -85,6 +90,97 @@ public class UsageTimeProvider {
         }
 
         return result;
+    }
+
+    /**
+     * @param dayOfWeek current day of week
+     * @return List of string, package name of used app
+     */
+    private List<String> getAppUsed(int dayOfWeek)
+    {
+
+        List<String> appUsed = new ArrayList<>();
+        Calendar now = Calendar.getInstance();
+        Calendar last = Calendar.getInstance();
+        last.set(Calendar.HOUR_OF_DAY, 0);
+        last.set(Calendar.MINUTE, 0);
+        last.set(Calendar.SECOND, 0);
+        last.set(Calendar.MILLISECOND, 0);
+        last.add(Calendar.DATE, -dayOfWeek);
+
+        now.set(Calendar.HOUR_OF_DAY, 23);
+        now.set(Calendar.MINUTE, 59);
+        now.set(Calendar.SECOND, 59);
+        now.set(Calendar.MILLISECOND, 59);
+        now.add(Calendar.DATE, 0);
+
+        UsageStatsManager manager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+        Map<String, UsageStats> stats = manager.queryAndAggregateUsageStats(last.getTimeInMillis(),now.getTimeInMillis());
+
+        PackagesSingleton helper = PackagesSingleton.getInstance(context.getPackageManager());
+
+        for(Map.Entry<String, UsageStats> entry : stats.entrySet())
+        {
+            // If the package is not a launcher package, exclude it from the return result.
+            if(!helper.isLauncherPackage(entry.getKey()))
+                continue;
+            appUsed.add(entry.getKey());
+
+
+        }
+        return appUsed;
+    }
+
+
+    /**
+     *
+     * @param dayOfWeek current day of the week
+     * @return a list of AppUsage for a week
+     * @return a list of AppUsage for a week
+     * @throws PackageManager.NameNotFoundException
+     */
+    public List<AppUsage> setAdapterList(int dayOfWeek) throws PackageManager.NameNotFoundException {
+
+        List<AppUsage> usages = new ArrayList<>();
+        UsageTimeProvider timeProvider = new UsageTimeProvider(context);
+        PackagesSingleton singleton = PackagesSingleton.getInstance(context.getPackageManager());
+        List<String> packageNames = timeProvider.getAppUsed(dayOfWeek);
+        for(int i= 0; i< packageNames.size(); i++) {
+            AppUsage appUsage = new AppUsage(singleton.packageToAppName(packageNames.get(i)));
+            appUsage.packageName = packageNames.get(i);
+            appUsage.icon = context.getPackageManager().getApplicationIcon(packageNames.get(i));
+            for (int day = dayOfWeek - 1; day >= 0; day--) {
+                Calendar beginning = Calendar.getInstance();
+                beginning.set(Calendar.HOUR_OF_DAY, 0);
+                beginning.set(Calendar.MINUTE, 0);
+                beginning.set(Calendar.SECOND, 0);
+                beginning.set(Calendar.MILLISECOND, 0);
+                beginning.add(Calendar.DATE, -day);
+
+                Calendar end = Calendar.getInstance();
+                end.set(Calendar.HOUR_OF_DAY, 23);
+                end.set(Calendar.MINUTE, 59);
+                end.set(Calendar.SECOND, 59);
+                end.set(Calendar.MILLISECOND, 59);
+                end.add(Calendar.DATE, -day);
+
+                appUsage.usageTime += timeProvider.getAppUsageTime(packageNames.get(i), beginning, end);
+            }
+            usages.add(appUsage);
+        }
+
+        Collections.sort(usages, new Comparator<AppUsage>() {
+            @Override
+            public int compare(AppUsage appUsage, AppUsage t1) {
+                if(appUsage.usageTime < t1.usageTime)
+                    return 1;
+                if(appUsage.usageTime > t1.usageTime)
+                    return -1;
+                return 0;
+            }
+        });
+
+        return  usages;
     }
 
 

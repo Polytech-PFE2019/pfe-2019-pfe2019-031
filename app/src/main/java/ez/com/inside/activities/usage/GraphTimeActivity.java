@@ -104,7 +104,6 @@ public class GraphTimeActivity extends AppCompatActivity
 
             times[nbDay] = provider.getAppUsageTime(packageName, beginning, end);
             nbDay ++;
-            Log.d("data i ", i + " " + times[i]);
         }
 
         for (int i = 0; i < currentDay; i++) {
@@ -176,6 +175,7 @@ public class GraphTimeActivity extends AppCompatActivity
         int total = 0;
         for(long time : times)
             total += (int) time;
+
         totalTimeView.setText(TimeFormatHelper.minutesToHours(total));
         ProgressBar progressBar = findViewById(R.id.progressBar_graph_time);
         float data = ((float)total/totalTime)*100;
