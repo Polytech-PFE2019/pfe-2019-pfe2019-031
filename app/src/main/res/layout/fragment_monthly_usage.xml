@@ -92,7 +92,7 @@
                 android:id="@+id/app2"
                 android:layout_width="40dp"
                 android:layout_height="42dp"
-                android:layout_marginStart="28dp"
+                android:layout_marginStart="24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/app1"
                 app:layout_constraintTop_toTopOf="parent"

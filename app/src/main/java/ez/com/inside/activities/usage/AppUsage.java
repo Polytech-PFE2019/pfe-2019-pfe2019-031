@@ -1,22 +1,23 @@
 package ez.com.inside.activities.usage;
 
-import android.graphics.drawable.Drawable;
+
+import java.io.Serializable;
 
 
 /**
  * Created by Charly on 07/12/2017.
  */
 
-public class AppUsage
+public class AppUsage implements Serializable
 {
     public String appName;
     public String packageName;
-    public Drawable icon;
     public long usageTime;
-    public double usageRate;
 
     public AppUsage(String appName)
     {
         this.appName = appName;
     }
+
+
 }

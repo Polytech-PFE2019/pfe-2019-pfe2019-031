@@ -7,16 +7,19 @@ import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
 
-import androidx.cardview.widget.CardView;
+import androidx.core.util.Pair;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.preference.PreferenceManager;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -25,7 +28,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ez.com.inside.R;
 import ez.com.inside.activities.helpers.TimeFormatHelper;
-import ez.com.inside.activities.listeners.OnClickListener;
 import ez.com.inside.activities.network.NetworkActivity;
 import ez.com.inside.activities.permissions.PermissionsActivity;
 import ez.com.inside.activities.settings.SettingsActivity;
@@ -39,11 +41,13 @@ import ez.com.inside.business.permission.PermissionsFinder;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
 import ez.com.inside.dialogs.AuthorisationDialog;
 
+
 public class StartActivity extends AppCompatActivity
 {
     private static final int REQUEST_PERMISSION_RESPONSE = 0;
     private List<AppUsage> usages = new ArrayList<>();
     private int currentDay;
+    int time = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,6 +64,7 @@ public class StartActivity extends AppCompatActivity
             fragment.show(getSupportFragmentManager(), "autorisation");
             return;
         }
+        initializeRecyclerView();
 
         Calendar c = Calendar.getInstance();
         TextView dashDate = findViewById(R.id.dashDate);
@@ -73,7 +78,6 @@ public class StartActivity extends AppCompatActivity
         dashDate2.setText("Aujourd\'hui," + text);
         dashDate3.setText("Aujourd\'hui," + text);
 
-        initializeRecyclerView();
         setPermission();
         getWifiLevel();
 
@@ -147,7 +151,10 @@ public class StartActivity extends AppCompatActivity
     }
 
     public void onClickApplicationsUsageActivity(View v){
-        startActivity(new Intent(this,UsageActivity.class));
+        Intent intent = new Intent(this, UsageActivity.class);
+        intent.putExtra("AppUsages", (Serializable) usages);
+        intent.putExtra("TotalTime", time);
+        startActivity(intent);
     }
 
     public void onClickNetworkActivity(View v){
@@ -185,17 +192,14 @@ public class StartActivity extends AppCompatActivity
             currentDay = 7;
 
         UsageTimeProvider timeProvider = new UsageTimeProvider(getApplicationContext());
+
         try {
-            usages = timeProvider.setAdapterListForWeek(currentDay);
+            Pair<List<AppUsage>, Integer> end = timeProvider.setAdapterListForWeek(currentDay);
+            usages = end.first;
+            time = end.second;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
-        int time = 0;
-        for(int i=0; i < usages.size(); i++){
-            time += usages.get(i).usageTime;
-        }
-        usages = usages.subList(0,3);
 
         TextView timeTotal = findViewById(R.id.dashtotaltime);
         timeTotal.setText(TimeFormatHelper.minutesToHours(time));
@@ -207,7 +211,7 @@ public class StartActivity extends AppCompatActivity
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        RecyclerView.Adapter adapter = new DashboardAdapter(usages, time);
+        RecyclerView.Adapter adapter = new DashboardAdapter(usages.subList(0,3), time);
         recyclerView.setAdapter(adapter);
 
         recyclerView.addItemDecoration(new ItemDecoration());

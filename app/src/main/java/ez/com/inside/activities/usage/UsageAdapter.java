@@ -2,6 +2,8 @@ package ez.com.inside.activities.usage;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.cardview.widget.CardView;
+
+import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +70,11 @@ public class UsageAdapter extends RecyclerView.Adapter<UsageAdapter.ViewHolder>
     {
         AppUsage item = dataset.get(position);
         holder.usageTimeView.setText(TimeFormatHelper.minutesToHours(item.usageTime));
-        holder.icon.setImageDrawable(item.icon);
+        try {
+            holder.icon.setImageDrawable(holder.progressBar.getContext().getPackageManager().getApplicationIcon(item.packageName));
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
         float data = ((float) item.usageTime/totalTime)*100;
         holder.progressBar.setProgress((int) data);
 

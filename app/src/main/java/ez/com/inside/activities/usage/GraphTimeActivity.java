@@ -147,7 +147,7 @@ public class GraphTimeActivity extends AppCompatActivity
         }
         pieData = new PieChartData(values);
         pieData.setHasLabels(true);
-        pieData.setHasLabelsOutside(true);
+        pieData.setHasLabelsOutside(false);
         pieData.setHasCenterCircle(true);
 
         pieChart.setPieChartData(pieData);

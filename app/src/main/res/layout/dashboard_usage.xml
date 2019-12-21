@@ -17,6 +17,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout2"
+        android:onClick="onClickApplicationsUsageActivity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#00312C2C"
@@ -25,6 +26,7 @@
 
         <TextView
             android:id="@+id/dashtitreusage"
+            android:onClick="onClickApplicationsUsageActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -38,6 +40,7 @@
 
         <TextView
             android:id="@+id/dashDate"
+            android:onClick="onClickApplicationsUsageActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -50,6 +53,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_usage"
+            android:onClick="onClickApplicationsUsageActivity"
             android:layout_width="0dp"
             android:layout_height="129dp"
             android:layout_marginStart="10dp"
@@ -61,6 +65,7 @@
 
         <TextView
             android:id="@+id/textView12"
+            android:onClick="onClickApplicationsUsageActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -71,6 +76,7 @@
 
         <TextView
             android:id="@+id/dashtotaltime"
+            android:onClick="onClickApplicationsUsageActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"

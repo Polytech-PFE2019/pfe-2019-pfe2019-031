@@ -3,9 +3,9 @@ package ez.com.inside.activities.usage;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,17 +14,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ez.com.inside.R;
 import ez.com.inside.activities.helpers.TimeFormatHelper;
-import ez.com.inside.business.helpers.PackagesSingleton;
-import ez.com.inside.business.usagerate.UsageRateProviderImpl;
 import ez.com.inside.business.usagetime.CorrespondanceItem;
 import ez.com.inside.business.usagetime.UsageTimeProvider;
 
@@ -65,7 +60,10 @@ public class MonthlyFragment extends Fragment {
     {
         super.onActivityCreated(savedInstanceState);
 
-        String[]monthName={"Janvier","Fevrier","Mars", "Avril", "Mai", "Juin", "Juillet",
+
+        initializeRecyclerView();
+
+        String[] monthName = {"Janvier","Fevrier","Mars", "Avril", "Mai", "Juin", "Juillet",
                 "Août", "Septembre", "Octobre", "Novembre", "Décembre"};
 
         Calendar c = Calendar.getInstance();
@@ -76,26 +74,18 @@ public class MonthlyFragment extends Fragment {
 
         chart = getView().findViewById(R.id.graph);
 
-        try{
-            generateUsages(c.get(Calendar.DAY_OF_MONTH));
-        }
-        catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
         TextView totalTime = getView().findViewById(R.id.timeMonthly);
         totalTime.setText(TimeFormatHelper.minutesToHours(totaltime));
-
 
         setRecycleView();
         addAppVisual();
         generateDefaultData();
-        initializeRecyclerView();
+
 
     }
 
     private void generateDefaultData() {
-        int numColumns = usages.size();
+        int numColumns = 5;
 
         List<Column> columns = new ArrayList<Column>();
         List<SubcolumnValue> values;
@@ -109,32 +99,60 @@ public class MonthlyFragment extends Fragment {
             columns.add(column);
         }
 
+
         data = new ColumnChartData(columns);
         chart.setColumnChartData(data);
     }
 
+    private void initializeRecyclerView()
+    {
+
+        UsageTimeProvider timeProvider = new UsageTimeProvider(getContext().getApplicationContext());
+        Calendar c = Calendar.getInstance();
+        try {
+            Pair<List<AppUsage>, Integer> result = timeProvider.setAdapterListForWeek(c.get(Calendar.DAY_OF_MONTH));
+            usages = result.first;
+            totaltime = result.second;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        RecyclerView recyclerView = getView().findViewById(R.id.recycleViewUsage);
+        recyclerView.setHasFixedSize(true);
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext().getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+
+        RecyclerView.Adapter adapter = new DashboardAdapter(usages, (int) totaltime);
+        recyclerView.setAdapter(adapter);
+
+        recyclerView.addItemDecoration(new ItemDecoration());
+    }
+
     private void addAppVisual(){
-        if(usages.get(0) != null){
-            ImageView app1 = getView().findViewById(R.id.app1);
-            app1.setImageDrawable(usages.get(0).icon);
-        }
-        if(usages.size() > 1){
-            ImageView app2 = getView().findViewById(R.id.app2);
-            app2.setImageDrawable(usages.get(1).icon);
-        }
-        if(usages.size() > 2){
-            ImageView app3  = getView().findViewById(R.id.app3);
-            app3.setImageDrawable(usages.get(2).icon);
-        }
-        if(usages.size() > 3){
-            ImageView app4 = getView().findViewById(R.id.app4);
-            app4.setImageDrawable(usages.get(3).icon);
-        }
-        if(usages.size() > 4){
-            ImageView app5 = getView().findViewById(R.id.app5);
-            app5.setImageDrawable(usages.get(4).icon);
+        if(usages.get(0) != null)
+            setIcon((ImageView) getView().findViewById(R.id.app1), usages.get(0).packageName);
+        if(usages.size() > 1)
+            setIcon((ImageView) getView().findViewById(R.id.app2), usages.get(1).packageName);
+        if(usages.size() > 2)
+            setIcon((ImageView) getView().findViewById(R.id.app3), usages.get(2).packageName);
+        if(usages.size() > 3)
+            setIcon((ImageView) getView().findViewById(R.id.app4), usages.get(3).packageName);
+        if(usages.size() > 4)
+            setIcon((ImageView) getView().findViewById(R.id.app5), usages.get(4).packageName);
+
+    }
+
+    private void setIcon(ImageView view, String packageName){
+        try {
+            view.setImageDrawable(getContext().getPackageManager().getApplicationIcon(packageName));
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
         }
     }
+
+
+
 
     private void setRecycleView(){
         List<CorrespondanceItem> listCI = new ArrayList<>();
@@ -154,78 +172,6 @@ public class MonthlyFragment extends Fragment {
 
     }
 
-    private void generateUsages(int nbDays) throws PackageManager.NameNotFoundException
-    {
-        UsageRateProviderImpl rateProvider = new UsageRateProviderImpl(getContext());
-        Map<String, Double> mapRates = rateProvider.allUsageRates(nbDays);
-
-        UsageTimeProvider timeProvider = new UsageTimeProvider(getContext());
-        Map<String, Long> mapTimes = timeProvider.getUsageTime(nbDays);
-
-        PackagesSingleton singleton = PackagesSingleton.getInstance(getContext().getPackageManager());
-
-        for(Map.Entry<String, Double> entry : mapRates.entrySet())
-        {
-            if(entry.getValue() < 0.1)
-                continue;
-
-            String packageName = entry.getKey();
-
-            AppUsage appUsage = new AppUsage(singleton.packageToAppName(packageName));
-            appUsage.packageName = packageName;
-            appUsage.usageRate = entry.getValue();
-            appUsage.usageTime = mapTimes.get(packageName);
-            appUsage.icon = getContext().getPackageManager().getApplicationIcon(packageName);
-
-            totaltime += appUsage.usageTime;
-
-            usages.add(appUsage);
-        }
-
-        Collections.sort(usages, new Comparator<AppUsage>() {
-            @Override
-            public int compare(AppUsage appUsage, AppUsage t1) {
-                if(appUsage.usageRate < t1.usageRate)
-                    return 1;
-                if(appUsage.usageRate > t1.usageRate)
-                    return -1;
-                return 0;
-            }
-        });
-    }
-
-    private void initializeRecyclerView()
-    {
-
-        UsageTimeProvider timeProvider = new UsageTimeProvider(getContext().getApplicationContext());
-        Calendar c = Calendar.getInstance();
-        try {
-            usages = timeProvider.setAdapterListForWeek(c.get(Calendar.DAY_OF_MONTH));
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        int time = 0;
-        for(int i=0; i < usages.size(); i++){
-            Log.d("data", usages.get(i).usageTime + "");
-            if(usages.get(i).usageTime < 2){
-                usages.remove(i);
-            }else {
-                time += usages.get(i).usageTime;
-            }
-        }
-
-        RecyclerView recyclerView = getView().findViewById(R.id.recycleViewUsage);
-        recyclerView.setHasFixedSize(true);
-
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext().getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-
-        RecyclerView.Adapter adapter = new DashboardAdapter(usages, time);
-        recyclerView.setAdapter(adapter);
-
-        recyclerView.addItemDecoration(new ItemDecoration());
-    }
 
 
 }

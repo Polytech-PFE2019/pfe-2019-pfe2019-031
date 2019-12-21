@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.core.util.Pair;
 import ez.com.inside.activities.usage.AppUsage;
 import ez.com.inside.business.helpers.PackagesSingleton;
 
@@ -124,8 +125,6 @@ public class UsageTimeProvider {
             if(!helper.isLauncherPackage(entry.getKey()))
                 continue;
             appUsed.add(entry.getKey());
-
-
         }
         return appUsed;
     }
@@ -138,17 +137,17 @@ public class UsageTimeProvider {
      * @return a list of AppUsage for a week
      * @throws PackageManager.NameNotFoundException
      */
-    public List<AppUsage> setAdapterListForWeek(int dayOfWeek) throws PackageManager.NameNotFoundException {
+    public Pair<List<AppUsage>, Integer> setAdapterListForWeek(int dayOfWeek) throws PackageManager.NameNotFoundException {
 
         List<AppUsage> usages = new ArrayList<>();
         UsageTimeProvider timeProvider = new UsageTimeProvider(context);
         PackagesSingleton singleton = PackagesSingleton.getInstance(context.getPackageManager());
         List<String> packageNames = timeProvider.getAppUsedWeek(dayOfWeek);
 
+        int totalTime= 0;
         for(int i= 0; i< packageNames.size(); i++) {
             AppUsage appUsage = new AppUsage(singleton.packageToAppName(packageNames.get(i)));
             appUsage.packageName = packageNames.get(i);
-            appUsage.icon = context.getPackageManager().getApplicationIcon(packageNames.get(i));
             for (int day = dayOfWeek - 1; day >= 0; day--) {
                 Calendar beginning = Calendar.getInstance();
                 beginning.set(Calendar.HOUR_OF_DAY, 0);
@@ -165,9 +164,13 @@ public class UsageTimeProvider {
                 end.add(Calendar.DATE, -day);
 
                 appUsage.usageTime += timeProvider.getAppUsageTime(packageNames.get(i), beginning, end);
+
             }
-            if(appUsage.usageTime > 0.1)
+
+            if(appUsage.usageTime > 0.1) {
+                totalTime +=  appUsage.usageTime;
                 usages.add(appUsage);
+            }
         }
 
         Collections.sort(usages, new Comparator<AppUsage>() {
@@ -181,7 +184,8 @@ public class UsageTimeProvider {
             }
         });
 
-        return  usages;
+        Pair<List<AppUsage>, Integer> end = new Pair<>(usages, totalTime);
+        return end;
     }
 
     /**

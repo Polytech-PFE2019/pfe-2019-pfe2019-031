@@ -1,5 +1,6 @@
 package ez.com.inside.activities.usage;
 
+import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +59,11 @@ public class DashboardAdapter extends  RecyclerView.Adapter<DashboardAdapter.Vie
     {
         AppUsage item = dataset.get(position);
         holder.usageTimeView.setText(TimeFormatHelper.minutesToHours(item.usageTime));
-        holder.icon.setImageDrawable(item.icon);
+        try {
+            holder.icon.setImageDrawable(holder.progressBar.getContext().getPackageManager().getApplicationIcon(item.packageName));
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
         float data = ((float) item.usageTime/time)*100;
         holder.progressBar.setProgress((int) data);
 

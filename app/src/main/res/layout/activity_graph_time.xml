@@ -58,13 +58,13 @@
         android:id="@+id/view"
         android:layout_width="0dp"
         android:layout_height="2dp"
+        android:layout_marginTop="22dp"
         android:background="#2C918F8F"
         app:layout_constraintBottom_toTopOf="@+id/scrollView2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar3"
-        app:layout_constraintVertical_bias="0.766" />
+        app:layout_constraintTop_toBottomOf="@+id/progressBar_graph_time" />
 
     <ScrollView
         android:id="@+id/scrollView2"
@@ -92,10 +92,13 @@
 
             <TextView
                 android:id="@+id/textView"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="22dp"
-                android:text="TextView"
+                android:layout_marginEnd="10dp"
+                android:text="Pourcentage d'utilisation de cette application par jour de la semaine"
+                android:textAlignment="center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.501"
                 app:layout_constraintStart_toStartOf="parent"
@@ -103,13 +106,13 @@
 
             <lecho.lib.hellocharts.view.PieChartView
                 android:id="@+id/PieChart"
-                android:layout_width="0dp"
-                android:layout_height="246dp"
+                android:layout_width="230dp"
+                android:layout_height="230dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="8dp"
-                android:padding="50dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="12dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView" />
         </androidx.constraintlayout.widget.ConstraintLayout>

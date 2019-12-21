@@ -1,20 +1,20 @@
 package ez.com.inside.activities.usage;
 
+import android.app.Activity;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 
 import androidx.core.util.Pair;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +28,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import ez.com.inside.R;
+import ez.com.inside.activities.permissions.FragmentListPermissions;
+import ez.com.inside.activities.permissions.FragmentLoading;
 import ez.com.inside.business.helpers.PackagesSingleton;
-import ez.com.inside.business.usagetime.UsageTimeProvider;
+import ez.com.inside.business.permission.AppPermissions;
 import ez.com.inside.business.usagetime.Utils;
 
 
@@ -42,6 +44,8 @@ import lecho.lib.hellocharts.view.ColumnChartView;
 
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPNAME;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPPKGNAME;
+import static ez.com.inside.activities.usage.UsageActivity.TOTALTIME;
+import static ez.com.inside.activities.usage.UsageActivity.USAGES;
 
 /**
  * Created by Charly on 08/12/2017.
@@ -51,18 +55,13 @@ public class WeeklyFragment extends Fragment
 {
 
     private long[] times;
-    private  List<AppUsage> usages;
 
-    private ColumnChartView chart;
-    private ColumnChartData data;
     private Utils utils = new Utils();
     private int currentDay = 1;
-    int sum = 0;
-
-
+    private ColumnChartView chart;
+    private ColumnChartData data;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        usages = new ArrayList<>();
         View rootView = inflater.inflate(R.layout.fragment_usage, container, false);
         chart = rootView.findViewById(R.id.AppRate_chart);
         return rootView;
@@ -83,7 +82,7 @@ public class WeeklyFragment extends Fragment
         generateDefaultData();
 
         TextView average = getView().findViewById(R.id.moyenne_hebdo);
-        average.setText("Moyenne hebdomadaire " + (sum/60)/currentDay + "h");
+        average.setText("Moyenne hebdomadaire " + (TOTALTIME/60)/currentDay + "h");
 
         initializeRecyclerView();
     }
@@ -98,13 +97,8 @@ public class WeeklyFragment extends Fragment
         int nbDay = 0;
         for(int i = currentDay - 1; i >= 0; i--)
         {
-            if(nbDay == 1){
                 times[i] = test(nbDay);
-            }
-            else {
-                times[i] = test(nbDay);
-            }
-            sum += times[i];
+
             nbDay ++;
         }
 
@@ -168,36 +162,28 @@ public class WeeklyFragment extends Fragment
             if(!helper.isLauncherPackage(entry.getKey()))
                 continue;
 
-            Log.d("data", entry.getKey() + " " + entry.getValue().getTotalTimeInForeground() );
             timeSpend += entry.getValue().getTotalTimeInForeground() / 60000;
         }
         return timeSpend;
 
     }
 
+
     private void initializeRecyclerView()
     {
-
-        UsageTimeProvider timeProvider = new UsageTimeProvider(getContext());
-        try {
-            usages = timeProvider.setAdapterListForWeek(currentDay);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
         RecyclerView recyclerView = getView().findViewById(R.id.list_usage);
         recyclerView.setHasFixedSize(true);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        RecyclerView.Adapter adapter = new UsageAdapter(usages, sum, new OnClickListenerTransition() {
+        RecyclerView.Adapter adapter = new UsageAdapter(USAGES, TOTALTIME, new OnClickListenerTransition() {
             @Override
             public void onClick(TextView appNameView, ImageView appIconView, int position) {
                 Intent intent = new Intent(getContext(), GraphTimeActivity.class);
-                intent.putExtra(EXTRA_APPNAME, usages.get(position).appName);
-                intent.putExtra(EXTRA_APPPKGNAME, usages.get(position).packageName);
-                intent.putExtra("TOTALTIME", sum);
+                intent.putExtra(EXTRA_APPNAME, USAGES.get(position).appName);
+                intent.putExtra(EXTRA_APPPKGNAME, USAGES.get(position).packageName);
+                intent.putExtra("TOTALTIME", TOTALTIME);
 
                 View sharedViewAppName = appNameView;
                 String transitionNameAppName = getString(R.string.transition_appName);
@@ -217,8 +203,6 @@ public class WeeklyFragment extends Fragment
 
         recyclerView.addItemDecoration(new ItemDecoration());
     }
-
-
 
 
 }
