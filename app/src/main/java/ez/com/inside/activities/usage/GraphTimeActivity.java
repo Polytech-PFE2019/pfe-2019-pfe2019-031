@@ -56,10 +56,11 @@ public class GraphTimeActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph_time);
-        setTitle("Suivi d\'utilisation");
-
         Intent intent = getIntent();
         appName = intent.getStringExtra(UsageActivity.EXTRA_APPNAME);
+        setTitle(appName);
+
+
         packageName = intent.getStringExtra(UsageActivity.EXTRA_APPPKGNAME);
         totalTime = intent.getIntExtra("TOTALTIME", 0);
 
@@ -154,11 +155,6 @@ public class GraphTimeActivity extends AppCompatActivity
     }
 
     private void setHeader(){
-
-        TextView appNameView = findViewById(R.id.appName);
-        appNameView.setText(appName);
-
-
         try{
             icon = getPackageManager().getApplicationIcon(packageName);
         }

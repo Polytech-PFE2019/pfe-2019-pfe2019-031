@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Inside</string>
+    <string name="app_name">Inside.v2</string>
 
     <string name="error_message">Vous n\'avez pas autorisé notre application à accéder aux usages de vos applications,
     veuillez appuyer sur Reessayer et accepter l\'autorisation d\'accès.</string>
@@ -43,6 +43,7 @@
     <string name="save_wifi">Enregister la wifi</string>
 
     <string name="most_used_app">Les 5 applications les plus utilisées</string>
+    <string name="all_app">Les applications utilisées durant le mois</string>
     <string name="screening_time">Temps d\'écran total</string>
     <string name="correspond_to">Correspond à :</string>
 

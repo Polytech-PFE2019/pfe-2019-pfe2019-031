@@ -36,6 +36,8 @@ public class UsageActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
         Intent intent = getIntent();
         USAGES = (List<AppUsage>) intent.getSerializableExtra("AppUsages");
         TOTALTIME = intent.getIntExtra("TotalTime", 0);

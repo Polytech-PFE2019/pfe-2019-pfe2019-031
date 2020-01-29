@@ -55,6 +55,7 @@ public class StartActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard);
 
+
         // Setting the default values. Called only once in the lifecycle of the app, hence the "false".
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
@@ -67,16 +68,10 @@ public class StartActivity extends AppCompatActivity
         initializeRecyclerView();
 
         Calendar c = Calendar.getInstance();
-        TextView dashDate = findViewById(R.id.dashDate);
-        TextView dashDate2 = findViewById(R.id.dashDate2);
-        TextView dashDate3 = findViewById(R.id.dashDate3);
 
         String[]monthName={"Janvier","Fevrier","Mars", "Avril", "Mai", "Juin", "Juillet",
                 "Août", "Septembre", "Octobre", "Novembre", "Decembre"};
         String text = c.get(Calendar.DAY_OF_MONTH) + " " + monthName[c.get(Calendar.MONTH)];
-        dashDate.setText("Aujourd\'hui," + text);
-        dashDate2.setText("Aujourd\'hui," + text);
-        dashDate3.setText("Aujourd\'hui," + text);
 
         setPermission();
         getWifiLevel();
@@ -201,6 +196,7 @@ public class StartActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+
         TextView timeTotal = findViewById(R.id.dashtotaltime);
         timeTotal.setText(TimeFormatHelper.minutesToHours(time));
 
@@ -211,9 +207,19 @@ public class StartActivity extends AppCompatActivity
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        RecyclerView.Adapter adapter = new DashboardAdapter(usages.subList(0,3), time);
+        int i = 0;
+
+        if(usages.size() >= 3 )
+            i = 3;
+        if(usages.size() == 2 )
+            i = 2;
+        if(usages.size() == 1 )
+            i = 1;
+
+        RecyclerView.Adapter adapter = new DashboardAdapter(usages.subList(0, i), time);
         recyclerView.setAdapter(adapter);
 
         recyclerView.addItemDecoration(new ItemDecoration());
+
     }
 }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ez.com.inside.R;
@@ -27,6 +28,8 @@ import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.view.ColumnChartView;
+
+import static android.widget.LinearLayout.VERTICAL;
 
 
 /**
@@ -92,11 +95,13 @@ public class MonthlyFragment extends Fragment {
 
         for (int i = 0; i < numColumns; ++i) {
             values = new ArrayList<>();
-            long time = usages.get(i).usageTime;
-            values.add(new SubcolumnValue(time / 60, -13388315));
-            Column column = new Column(values);
-            column.setHasLabels(true);
-            columns.add(column);
+            if(usages.size() > i ) {
+                long time = usages.get(i).usageTime;
+                values.add(new SubcolumnValue(time / 60, -13388315));
+                Column column = new Column(values);
+                column.setHasLabels(true);
+                columns.add(column);
+            }
         }
 
 

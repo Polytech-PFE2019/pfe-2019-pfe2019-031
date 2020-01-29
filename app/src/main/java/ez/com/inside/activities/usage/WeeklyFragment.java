@@ -12,9 +12,11 @@ import androidx.fragment.app.Fragment;
 
 import androidx.core.util.Pair;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,10 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import ez.com.inside.R;
-import ez.com.inside.activities.permissions.FragmentListPermissions;
-import ez.com.inside.activities.permissions.FragmentLoading;
 import ez.com.inside.business.helpers.PackagesSingleton;
-import ez.com.inside.business.permission.AppPermissions;
 import ez.com.inside.business.usagetime.Utils;
 
 
@@ -42,6 +41,7 @@ import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.view.ColumnChartView;
 
+import static android.widget.LinearLayout.VERTICAL;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPNAME;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPPKGNAME;
 import static ez.com.inside.activities.usage.UsageActivity.TOTALTIME;
@@ -97,8 +97,7 @@ public class WeeklyFragment extends Fragment
         int nbDay = 0;
         for(int i = currentDay - 1; i >= 0; i--)
         {
-                times[i] = test(nbDay);
-
+            times[i] = test(nbDay);
             nbDay ++;
         }
 
@@ -136,6 +135,8 @@ public class WeeklyFragment extends Fragment
 
     public long test(int beginAt)
     {
+
+
         Calendar now = Calendar.getInstance();
         Calendar last = Calendar.getInstance();
         last.set(Calendar.HOUR_OF_DAY, 0);
@@ -149,6 +150,10 @@ public class WeeklyFragment extends Fragment
         now.set(Calendar.SECOND, 59);
         now.set(Calendar.MILLISECOND, 59);
         now.add(Calendar.DATE, -beginAt);
+
+
+        Log.d("data", beginAt + " " + last.toString());
+        Log.d("data", now.toString());
 
         UsageStatsManager manager=(UsageStatsManager)getContext().getSystemService(Context.USAGE_STATS_SERVICE);
         Map<String, UsageStats> stats = manager.queryAndAggregateUsageStats(last.getTimeInMillis(),now.getTimeInMillis());
@@ -200,8 +205,8 @@ public class WeeklyFragment extends Fragment
             }
         });
         recyclerView.setAdapter(adapter);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), VERTICAL));
 
-        recyclerView.addItemDecoration(new ItemDecoration());
     }
 
 

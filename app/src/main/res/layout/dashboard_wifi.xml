@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardViewData"
     android:layout_width="match_parent"
     android:layout_height="210dp"
@@ -8,15 +9,13 @@
     android:layout_marginTop="24dp"
     android:layout_marginEnd="16dp"
     android:onClick="onClickNetworkActivity"
-    app:cardBackgroundColor="#99EFF1F3"
-    app:cardCornerRadius="20dp"
+    app:cardCornerRadius="0dp"
     app:cardElevation="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#00312C2C"
         android:onClick="onClickNetworkActivity"
         android:visibility="visible">
 
@@ -25,39 +24,39 @@
             android:id="@+id/dashtitreusage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif-thin"
+            android:onClick="onClickNetworkActivity"
             android:text="@string/dash_data_title"
             android:textSize="18sp"
-            android:onClick="onClickNetworkActivity"
-            android:textStyle="bold"
+            android:textStyle="normal|bold"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.025"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-
-        <TextView
-            android:id="@+id/dashDate3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="TextView"
-            android:onClick="onClickNetworkActivity"
-            android:textColor="@color/colorAccent"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dashtitreusage" />
 
         <include
             layout="@layout/wifi_detail_item"
             android:layout_width="267dp"
             android:layout_height="99dp"
+            android:layout_marginTop="24dp"
             android:onClick="onClickNetworkActivity"
-            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.142"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dashDate3" />
+            app:layout_constraintTop_toBottomOf="@+id/dashtitreusage" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/wifi" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
