@@ -1,6 +1,5 @@
 package ez.com.inside.activities.usage;
 
-import android.app.Activity;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
@@ -11,7 +10,6 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 
 import androidx.core.util.Pair;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,6 +44,7 @@ import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPNAME;
 import static ez.com.inside.activities.usage.UsageActivity.EXTRA_APPPKGNAME;
 import static ez.com.inside.activities.usage.UsageActivity.TOTALTIME;
 import static ez.com.inside.activities.usage.UsageActivity.USAGES;
+import ez.com.inside.business.usagetime.UsageTimeProvider;
 
 /**
  * Created by Charly on 08/12/2017.
@@ -55,15 +54,18 @@ public class WeeklyFragment extends Fragment
 {
 
     private long[] times;
-
+    private UsageTimeProvider usageTimeProvider;
     private Utils utils = new Utils();
     private int currentDay = 1;
     private ColumnChartView chart;
     private ColumnChartData data;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_usage, container, false);
         chart = rootView.findViewById(R.id.AppRate_chart);
+        usageTimeProvider = new UsageTimeProvider(getContext());
         return rootView;
     }
 
@@ -97,7 +99,7 @@ public class WeeklyFragment extends Fragment
         int nbDay = 0;
         for(int i = currentDay - 1; i >= 0; i--)
         {
-            times[i] = test(nbDay);
+            times[i] = usageTimeProvider.getTotalUsageDay(nbDay);
             nbDay ++;
         }
 
@@ -132,46 +134,6 @@ public class WeeklyFragment extends Fragment
         chart.setColumnChartData(data);
     }
 
-
-    public long test(int beginAt)
-    {
-
-
-        Calendar now = Calendar.getInstance();
-        Calendar last = Calendar.getInstance();
-        last.set(Calendar.HOUR_OF_DAY, 0);
-        last.set(Calendar.MINUTE, 0);
-        last.set(Calendar.SECOND, 0);
-        last.set(Calendar.MILLISECOND, 0);
-        last.add(Calendar.DATE, -beginAt);
-
-        now.set(Calendar.HOUR_OF_DAY, 23);
-        now.set(Calendar.MINUTE, 59);
-        now.set(Calendar.SECOND, 59);
-        now.set(Calendar.MILLISECOND, 59);
-        now.add(Calendar.DATE, -beginAt);
-
-
-        Log.d("data", beginAt + " " + last.toString());
-        Log.d("data", now.toString());
-
-        UsageStatsManager manager=(UsageStatsManager)getContext().getSystemService(Context.USAGE_STATS_SERVICE);
-        Map<String, UsageStats> stats = manager.queryAndAggregateUsageStats(last.getTimeInMillis(),now.getTimeInMillis());
-
-        PackagesSingleton helper = PackagesSingleton.getInstance(getContext().getPackageManager());
-
-        long timeSpend = 0;
-        for(Map.Entry<String, UsageStats> entry : stats.entrySet())
-        {
-            // If the package is not a launcher package, exclude it from the return result.
-            if(!helper.isLauncherPackage(entry.getKey()))
-                continue;
-
-            timeSpend += entry.getValue().getTotalTimeInForeground() / 60000;
-        }
-        return timeSpend;
-
-    }
 
 
     private void initializeRecyclerView()

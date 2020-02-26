@@ -5,8 +5,6 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -59,8 +57,6 @@ public class GraphTimeActivity extends AppCompatActivity
         Intent intent = getIntent();
         appName = intent.getStringExtra(UsageActivity.EXTRA_APPNAME);
         setTitle(appName);
-
-
         packageName = intent.getStringExtra(UsageActivity.EXTRA_APPPKGNAME);
         totalTime = intent.getIntExtra("TOTALTIME", 0);
 
@@ -140,7 +136,8 @@ public class GraphTimeActivity extends AppCompatActivity
     private void initializePieChart(){
         pieChart = findViewById(R.id.PieChart);
         List<SliceValue> values = new ArrayList<>();
-        for (int i = 0; i < currentDay; ++i) {
+
+        for (int i = 0; i < currentDay; i++) {
             float data = ((float) times[i]/totalTime)*100;
             SliceValue sliceValue = new SliceValue(data, -13388315);
             sliceValue.setLabel(utils.getDayName(i+1) + " " + df.format(data)+"%");
@@ -150,7 +147,6 @@ public class GraphTimeActivity extends AppCompatActivity
         pieData.setHasLabels(true);
         pieData.setHasLabelsOutside(false);
         pieData.setHasCenterCircle(true);
-
         pieChart.setPieChartData(pieData);
     }
 
@@ -164,8 +160,6 @@ public class GraphTimeActivity extends AppCompatActivity
 
         ImageView iconView = findViewById(R.id.icon);
         iconView.setImageDrawable(icon);
-
-
 
         TextView totalTimeView = findViewById(R.id.total_time);
         int total = 0;

@@ -4,6 +4,7 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -91,6 +92,51 @@ public class UsageTimeProvider {
 
         return result;
     }
+
+
+    /**
+     * Get total usage spend for a day
+     * @param beginAt day
+     * @return hour of time spend
+     */
+    public long getTotalUsageDay(int beginAt)
+    {
+        Calendar now = Calendar.getInstance();
+        Calendar last = Calendar.getInstance();
+        last.set(Calendar.HOUR_OF_DAY, 0);
+        last.set(Calendar.MINUTE, 0);
+        last.set(Calendar.SECOND, 0);
+        last.set(Calendar.MILLISECOND, 0);
+        last.add(Calendar.DATE, -beginAt);
+
+        now.set(Calendar.HOUR_OF_DAY, 23);
+        now.set(Calendar.MINUTE, 59);
+        now.set(Calendar.SECOND, 59);
+        now.set(Calendar.MILLISECOND, 59);
+        now.add(Calendar.DATE, -beginAt);
+
+
+        Log.d("data", beginAt + " " + last.toString());
+        Log.d("data", now.toString());
+
+        UsageStatsManager manager=(UsageStatsManager)context.getSystemService(Context.USAGE_STATS_SERVICE);
+        Map<String, UsageStats> stats = manager.queryAndAggregateUsageStats(last.getTimeInMillis(),now.getTimeInMillis());
+
+        PackagesSingleton helper = PackagesSingleton.getInstance(context.getPackageManager());
+
+        long timeSpend = 0;
+        for(Map.Entry<String, UsageStats> entry : stats.entrySet())
+        {
+            // If the package is not a launcher package, exclude it from the return result.
+            if(!helper.isLauncherPackage(entry.getKey()))
+                continue;
+
+            timeSpend += entry.getValue().getTotalTimeInForeground() / 60000;
+        }
+        return timeSpend;
+
+    }
+
 
     /**
      * @param dayOfWeek current day of week

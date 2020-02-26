@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +67,7 @@ public class MonthlyFragment extends Fragment {
 
         initializeRecyclerView();
 
-        String[] monthName = {"Janvier","Fevrier","Mars", "Avril", "Mai", "Juin", "Juillet",
+        String[] monthName = {"Janvier","Février","Mars", "Avril", "Mai", "Juin", "Juillet",
                 "Août", "Septembre", "Octobre", "Novembre", "Décembre"};
 
         Calendar c = Calendar.getInstance();
@@ -156,17 +157,15 @@ public class MonthlyFragment extends Fragment {
         }
     }
 
-
-
-
     private void setRecycleView(){
         List<CorrespondanceItem> listCI = new ArrayList<>();
+        Log.d("  ", "" + totaltime);
 
         listCI.add(new CorrespondanceItem(getResources().getDrawable(R.drawable.movies), totaltime/120, "films visionnés"));
-        listCI.add(new CorrespondanceItem(getResources().getDrawable(R.drawable.fruit), totaltime/30, "pauses repas"));
-        listCI.add(new CorrespondanceItem(getResources().getDrawable(R.drawable.coffee), totaltime/10, "pauses cafés"));
+        listCI.add(new CorrespondanceItem(getResources().getDrawable(R.drawable.fruit), totaltime/60, "pauses repas"));
+        listCI.add(new CorrespondanceItem(getResources().getDrawable(R.drawable.coffee), totaltime/5, "pauses cafés"));
         listCI.add(new CorrespondanceItem(getResources().getDrawable(R.drawable.series), totaltime/45, "épisodes de séries"));
-        listCI.add(new CorrespondanceItem(getResources().getDrawable(R.drawable.worker), totaltime/8, "journées travaillées"));
+        listCI.add(new CorrespondanceItem(getResources().getDrawable(R.drawable.worker), totaltime/420, "journées travaillées"));
 
         RecyclerView recyclerView = getView().findViewById(R.id.recyclerView);
 
@@ -176,7 +175,4 @@ public class MonthlyFragment extends Fragment {
         recyclerView.setAdapter(correspondanceAdapter);
 
     }
-
-
-
 }

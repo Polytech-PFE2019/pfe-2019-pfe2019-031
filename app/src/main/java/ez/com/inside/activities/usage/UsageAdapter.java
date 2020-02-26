@@ -1,8 +1,6 @@
 package ez.com.inside.activities.usage;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.cardview.widget.CardView;
-
 import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,10 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import java.text.DecimalFormat;
 import java.util.List;
-
 import ez.com.inside.R;
 import ez.com.inside.activities.helpers.TimeFormatHelper;
 
